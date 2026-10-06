@@ -106,6 +106,10 @@ async def get_status():
         "confluence_radar": engine.latest_confluence_scores
     }
 
+@app.get("/api/reports")
+async def get_performance_reports():
+    return engine.router.db.get_pnl_reports()
+
 @app.post("/api/trade/force-buy")
 async def force_buy(symbol: str = "BTC/USDT"):
     df = await engine.router.fetch_ohlcv(symbol, timeframe="1m", limit=10)
