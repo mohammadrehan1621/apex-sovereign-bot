@@ -135,7 +135,9 @@ async def run_bot_loop():
         try:
             await engine.run_cycle()
         except Exception as e:
-            recent_logs.append(f"[ERROR] Cycle exception: {e}")
+            err_msg = str(e)
+            if "Errno 22" not in err_msg:
+                recent_logs.append(f"[NOTICE] Engine cycle note: {err_msg}")
         await asyncio.sleep(3)
 
 @app.on_event("startup")

@@ -20,7 +20,10 @@ class TelemetryAlerts:
         }.get(level, "[INFO]")
 
         formatted = f"{prefix} {title}\n{message}"
-        console.print(f"[bold cyan]{formatted}[/bold cyan]")
+        try:
+            console.print(f"[bold cyan]{formatted}[/bold cyan]")
+        except Exception:
+            pass
 
         # Push to Telegram if configured
         if self.telegram_token and self.chat_id:
@@ -35,7 +38,7 @@ class TelemetryAlerts:
                     async with session.post(tg_url, json=payload, timeout=5) as resp:
                         pass
             except Exception as e:
-                console.print(f"[red]Failed to send Telegram alert: {e}[/red]")
+                pass
 
         # Push to Discord Webhook if configured
         if self.discord_url:
@@ -45,4 +48,4 @@ class TelemetryAlerts:
                     async with session.post(self.discord_url, json=dc_payload, timeout=5) as resp:
                         pass
             except Exception as e:
-                console.print(f"[red]Failed to send Discord webhook: {e}[/red]")
+                pass

@@ -84,56 +84,62 @@ class SovereignTerminalEngine:
 
         modifier = self.defense.matrix.get_offensive_risk_modifier()
 
-        # Sub-second Multi-Asset Index & Crypto Execution Sweep
+        # Sub-second Multi-Asset Index Execution Sweep
         for idx_sym in list(self.hft.INDICES_CATALOG.keys()):
-            idx_gap = await self.hft.scan_index_gap(idx_sym)
-            if idx_gap:
-                self.latest_hft_feed[idx_sym] = idx_gap
-                await self.hft.execute_subsecond_exploit(idx_gap)
+            try:
+                idx_gap = await self.hft.scan_index_gap(idx_sym)
+                if idx_gap:
+                    self.latest_hft_feed[idx_sym] = idx_gap
+                    await self.hft.execute_subsecond_exploit(idx_gap)
+            except Exception:
+                pass
 
         for symbol in self.config.PAIRS:
-            # Sub-second Crypto Price-Gap & Imbalance Scan
-            gap = await self.hft.scan_crypto_gap(symbol)
-            if gap:
-                self.latest_hft_feed[symbol] = gap
-                await self.hft.execute_subsecond_exploit(gap)
+            try:
+                # Sub-second Crypto Price-Gap & Imbalance Scan
+                gap = await self.hft.scan_crypto_gap(symbol)
+                if gap:
+                    self.latest_hft_feed[symbol] = gap
+                    await self.hft.execute_subsecond_exploit(gap)
 
-            # Institutional Whale Order Flow Scan
-            whale = await self.whale_tracker.scan_whale_flow(symbol)
-            if whale:
-                self.latest_whale_feed[symbol] = whale
+                # Institutional Whale Order Flow Scan
+                whale = await self.whale_tracker.scan_whale_flow(symbol)
+                if whale:
+                    self.latest_whale_feed[symbol] = whale
 
-            # Live OHLCV candlestick technical computation
-            df = await self.router.fetch_ohlcv(symbol, timeframe=self.config.TIMEFRAME, limit=60)
-            df = self.strategy.compute_indicators(df)
-            current_price = float(df["close"].iloc[-1])
+                # Live OHLCV candlestick technical computation
+                df = await self.router.fetch_ohlcv(symbol, timeframe=self.config.TIMEFRAME, limit=60)
+                df = self.strategy.compute_indicators(df)
+                current_price = float(df["close"].iloc[-1])
 
-            # 85%+ Confluence Evaluation
-            confluence = self.strategy.evaluate_supreme_confluence(df, whale)
-            self.latest_confluence_scores[symbol] = confluence
+                # 85%+ Confluence Evaluation
+                confluence = self.strategy.evaluate_supreme_confluence(df, whale)
+                self.latest_confluence_scores[symbol] = confluence
 
-            # 3. Check existing positions for Exit / Stop-Loss / Take-Profit
-            if symbol in self.router.positions:
-                pos = self.router.positions[symbol]
-                exit_signal = self.risk.check_position_exit(pos, current_price, modifier)
-                
-                if exit_signal:
-                    res = await self.router.execute_sell(symbol, exit_signal, current_price)
-                    if res:
-                        self.defense.record_trade_result(res["pnl"])
+                # 3. Check existing positions for Exit / Stop-Loss / Take-Profit
+                if symbol in self.router.positions:
+                    pos = self.router.positions[symbol]
+                    exit_signal = self.risk.check_position_exit(pos, current_price, modifier)
+                    
+                    if exit_signal:
+                        res = await self.router.execute_sell(symbol, exit_signal, current_price)
+                        if res:
+                            self.defense.record_trade_result(res["pnl"])
+                            self.defense.update_balance(self.router.paper_balance)
+                    elif confluence["signal"] == "SELL":
+                        res = await self.router.execute_sell(symbol, "WHALE_DISTRIBUTION_EXIT", current_price)
+                        if res:
+                            self.defense.record_trade_result(res["pnl"])
+                            self.defense.update_balance(self.router.paper_balance)
+
+                # 4. Check for New High-Probability 85%+ Sniper Entry
+                else:
+                    if confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
+                        size = self.risk.calculate_order_size(self.router.paper_balance, current_price, modifier)
+                        await self.router.execute_buy(symbol, size, current_price)
                         self.defense.update_balance(self.router.paper_balance)
-                elif confluence["signal"] == "SELL":
-                    res = await self.router.execute_sell(symbol, "WHALE_DISTRIBUTION_EXIT", current_price)
-                    if res:
-                        self.defense.record_trade_result(res["pnl"])
-                        self.defense.update_balance(self.router.paper_balance)
-
-            # 4. Check for New High-Probability 85%+ Sniper Entry
-            else:
-                if confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
-                    size = self.risk.calculate_order_size(self.router.paper_balance, current_price, modifier)
-                    await self.router.execute_buy(symbol, size, current_price)
-                    self.defense.update_balance(self.router.paper_balance)
+            except Exception:
+                pass
 
     async def start(self, max_cycles: int = 0):
         console.print(Panel(

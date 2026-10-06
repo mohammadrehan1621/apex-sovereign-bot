@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 from typing import Dict, Any, List
 import ccxt.async_support as ccxt
 import pandas as pd
