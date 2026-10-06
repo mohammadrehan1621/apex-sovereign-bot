@@ -660,10 +660,12 @@
         <div class="glass-panel kpi-card">
             <div class="kpi-label">Total Portfolio Equity</div>
             <div class="kpi-val" id="total-equity">$10,000.00</div>
-            <div class="kpi-sub">
+            <div class="kpi-sub" style="font-size: 0.72rem; line-height: 1.4;">
                 <span style="color: var(--accent-emerald);" id="net-roi">+0.00% Net ROI</span>
-                <span style="color: var(--text-muted);">| Cash:</span>
-                <span id="liquid-cash" style="color: #fff;">$10,000.00</span>
+                <span style="color: var(--text-muted);">| Capital:</span>
+                <span id="trading-capital-display" style="color: #fff;">$10,000.00</span>
+                <span style="color: var(--text-muted);">| Alpha:</span>
+                <span id="alpha-shield-sub" style="color: var(--accent-emerald);">+$0.00</span>
             </div>
         </div>
 
@@ -811,7 +813,20 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px;">
         <!-- Active Positions Panel -->
         <div class="glass-panel">
-            <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px;">⚡ Active Swing Allocations</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0;">⚡ Active Swing Allocations</h2>
+                    <span id="swing-alloc-badge" class="brand-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.4); font-size: 0.7rem; padding: 2px 8px;">STATE: ACTIVE</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="toggle-swing-btn" onclick="toggleSwingAllocations()" class="btn-action" style="padding: 6px 14px; font-size: 0.72rem; font-weight: 700; background: rgba(16, 185, 129, 0.18); border: 1px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                        ● SWING: ON
+                    </button>
+                    <button onclick="flattenAllPositions()" class="btn-action" style="padding: 6px 12px; font-size: 0.72rem; font-weight: 700; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: var(--accent-rose); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                        FLATTEN ALL
+                    </button>
+                </div>
+            </div>
             <div class="ledger-table-wrap">
                 <table>
                     <thead>
@@ -1158,7 +1173,13 @@
 
                 // Core Equity KPIs
                 document.getElementById('total-equity').textContent = `$${data.equity.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-                document.getElementById('liquid-cash').textContent = `$${data.cash.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                if (document.getElementById('trading-capital-display')) {
+                    document.getElementById('trading-capital-display').textContent = `$${(data.trading_capital || data.cash).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                }
+                if (document.getElementById('alpha-shield-sub')) {
+                    const shieldVal = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : (data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit);
+                    document.getElementById('alpha-shield-sub').textContent = `+$${shieldVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                }
                 
                 const roi = ((data.equity - 10000.0) / 10000.0) * 100;
                 const roiEl = document.getElementById('net-roi');
@@ -1200,10 +1221,15 @@
                     confEl.style.color = c.probability_score >= 85 ? 'var(--accent-emerald)' : 'var(--accent-primary)';
                 }
 
-                // Proof of Value Metrics
+                // Proof of Value Metrics (Capital Shield & Alpha Value card)
                 document.getElementById('slippage-stat').textContent = `+$${data.total_alpha_saved.toFixed(2)}`;
-                const totalValue = data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit;
-                document.getElementById('value-generated').textContent = `${totalValue >= 0 ? '+' : ''}$${totalValue.toFixed(2)}`;
+                const totalAlphaShield = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : (data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit);
+                document.getElementById('value-generated').textContent = `${totalAlphaShield >= 0 ? '+' : ''}$${totalAlphaShield.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+                // Sync Automated Swing Allocations State
+                if (data.trade_swing_allocations !== undefined) {
+                    updateSwingAllocUI(data.trade_swing_allocations);
+                }
 
                 // Active Allocations Table
                 const posBody = document.getElementById('active-positions-body');
@@ -1643,6 +1669,52 @@
                     alertBox.style.color = 'var(--accent-rose)';
                     alertBox.textContent = `✕ Focus change error: ${err.message}`;
                 }
+            }
+        }
+
+        // Active Swing Allocations Switching & Flattening
+        let swingAllocationsActive = true;
+
+        function updateSwingAllocUI(enabled) {
+            swingAllocationsActive = !!enabled;
+            const badge = document.getElementById('swing-alloc-badge');
+            const btn = document.getElementById('toggle-swing-btn');
+            if (badge) {
+                badge.textContent = swingAllocationsActive ? 'STATE: ACTIVE' : 'STATE: PAUSED';
+                badge.style.color = swingAllocationsActive ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+                badge.style.borderColor = swingAllocationsActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)';
+                badge.style.background = swingAllocationsActive ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)';
+            }
+            if (btn) {
+                btn.textContent = swingAllocationsActive ? '● SWING: ON' : '○ SWING: OFF';
+                btn.style.borderColor = swingAllocationsActive ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+                btn.style.color = swingAllocationsActive ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+                btn.style.background = swingAllocationsActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)';
+            }
+        }
+
+        async function toggleSwingAllocations() {
+            const newState = !swingAllocationsActive;
+            updateSwingAllocUI(newState);
+            try {
+                const res = await fetch(`/api/bot/swing-allocations?enabled=${newState}`, { method: 'POST' });
+                const data = await res.json();
+                updateSwingAllocUI(data.enabled);
+                fetchCitadelStatus();
+            } catch (e) {
+                console.error("Failed to toggle swing allocations:", e);
+            }
+        }
+
+        async function flattenAllPositions() {
+            if (!confirm("Are you sure you want to close and flatten all active swing positions to cash?")) return;
+            try {
+                const res = await fetch('/api/positions/close-all', { method: 'POST' });
+                const data = await res.json();
+                alert(data.message || "Positions flattened.");
+                fetchCitadelStatus();
+            } catch (e) {
+                console.error("Flatten error:", e);
             }
         }
 

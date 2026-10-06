@@ -26,6 +26,7 @@ class BotConfig(BaseModel):
     TRADE_INDICES: bool = Field(default=True, description="Enable Global Indices trading (S&P 500, Nasdaq, Dow, Nikkei)")
     TRADE_COMMODITIES: bool = Field(default=True, description="Enable Commodities trading (Gold, Silver, Crude Oil)")
     TRADE_FOREX: bool = Field(default=True, description="Enable Forex trading (EUR/USD, GBP/USD, USD/JPY)")
+    TRADE_SWING_ALLOCATIONS: bool = Field(default=True, description="Enable or disable automated swing allocations")
     
     # Supreme Execution & Risk
     MAX_POSITION_SIZE_PCT: float = Field(default=0.15, description="Max 15% capital per single position")

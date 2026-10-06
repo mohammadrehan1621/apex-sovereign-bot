@@ -73,7 +73,7 @@ async def get_status():
     unrealized = 0.0
     for sym, pos in engine.router.positions.items():
         unrealized += pos["quantity"] * pos["entry_price"]
-    total_equity = cash + unrealized
+    trading_capital = cash + unrealized
 
     mod = engine.defense.matrix.get_offensive_risk_modifier()
 
@@ -84,9 +84,18 @@ async def get_status():
     total_alpha_saved = sum([t.get("alpha_saved_usd", 0) for t in trades])
     win_rate = (len(win_trades) / len(trades) * 100) if len(trades) > 0 else 0.0
 
+    # Capital Shield & Alpha Value: Direct Profit + Slippage Saved by Bot
+    shield_and_alpha_value = round(total_realized_pnl + total_alpha_saved + engine.hft.total_hft_profit, 2)
+
+    # Total Portfolio Equity = Trading Capital + Capital Shield & Alpha Value
+    total_equity = round(trading_capital + shield_and_alpha_value, 2)
+
     return {
         "equity": total_equity,
-        "cash": cash,
+        "trading_capital": round(trading_capital, 2),
+        "shield_and_alpha_value": shield_and_alpha_value,
+        "cash": round(cash, 2),
+        "unrealized": round(unrealized, 2),
         "active_tier": mod["current_tier"],
         "tier_name": mod["tier_name"],
         "difficulty_mult": engine.defense.matrix.kinetic_tightening_factor,
@@ -104,7 +113,8 @@ async def get_status():
         "hft_trades_history": engine.hft.index_trades_history[-20:],
         "whale_flow": engine.latest_whale_feed,
         "confluence_radar": engine.latest_confluence_scores,
-        "bot_market_focus": engine.config.BOT_MARKET_FOCUS
+        "bot_market_focus": engine.config.BOT_MARKET_FOCUS,
+        "trade_swing_allocations": engine.config.TRADE_SWING_ALLOCATIONS
     }
 
 @app.get("/api/reports")
@@ -203,6 +213,46 @@ async def toggle_market(market: str, enabled: bool):
     status_str = "ENABLED" if enabled else "DISABLED"
     recent_logs.append(f"[MARKET CONFIG] {market_upper} Trading {status_str} by Commander.")
     return {"status": "SUCCESS", "market": market_upper, "enabled": enabled}
+
+@app.get("/api/bot/swing-allocations")
+async def get_swing_allocations_status():
+    return {
+        "enabled": engine.config.TRADE_SWING_ALLOCATIONS,
+        "active_positions_count": len(engine.router.positions),
+        "positions": engine.router.positions
+    }
+
+@app.post("/api/bot/swing-allocations")
+async def toggle_swing_allocations(enabled: bool):
+    engine.config.TRADE_SWING_ALLOCATIONS = enabled
+    state_str = "ACTIVE" if enabled else "PAUSED"
+    msg = f"[SWING ALLOCATIONS] Automated Swing Entry state set to: {state_str} by Commander."
+    recent_logs.append(msg)
+    return {
+        "status": "SUCCESS",
+        "enabled": engine.config.TRADE_SWING_ALLOCATIONS,
+        "message": msg
+    }
+
+@app.post("/api/positions/close-all")
+async def close_all_positions():
+    closed = []
+    for sym in list(engine.router.positions.keys()):
+        try:
+            curr_price = engine.router.positions[sym].get("entry_price", 1.0)
+            res = await engine.router.execute_sell(sym, "MANUAL_COMMAND_FLATTEN", curr_price)
+            if res:
+                closed.append(sym)
+        except Exception:
+            pass
+    msg = f"[POSITIONS FLATTENED] Closed {len(closed)} open swing positions to cash."
+    recent_logs.append(msg)
+    return {
+        "status": "SUCCESS",
+        "closed_count": len(closed),
+        "closed_symbols": closed,
+        "message": msg
+    }
 
 @app.post("/api/trade/custom-order")
 async def submit_custom_order(symbol: str, asset_class: str = "CRYPTO", action: str = "BUY"):

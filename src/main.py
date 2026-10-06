@@ -144,7 +144,7 @@ class SovereignTerminalEngine:
 
                     # 4. Check for New High-Probability 85%+ Sniper Entry
                     else:
-                        if confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
+                        if self.config.TRADE_SWING_ALLOCATIONS and confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
                             size = self.risk.calculate_order_size(self.router.paper_balance, current_price, modifier)
                             await self.router.execute_buy(symbol, size, current_price)
                             self.defense.update_balance(self.router.paper_balance)
