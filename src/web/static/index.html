@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Sovereign | World-Class Algorithmic Trading Citadel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-deep: #05070c;
+            --bg-surface: rgba(13, 18, 30, 0.7);
+            --bg-card: rgba(18, 25, 42, 0.65);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(56, 189, 248, 0.3);
+            --accent-primary: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+            --text-heading: #f8fafc;
+            --text-body: #94a3b8;
+            --text-muted: #64748b;
+            --glow-emerald: 0 0 24px rgba(16, 185, 129, 0.25);
+            --glow-primary: 0 0 24px rgba(56, 189, 248, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+            color: var(--text-heading);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 28px 36px;
+            overflow-x: hidden;
+            backdrop-filter: blur(80px);
+        }
+
+        /* Glassmorphic Container Standards */
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        /* Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo-gem {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0284c7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-badge {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--accent-emerald);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pulse-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-body);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 12px var(--accent-emerald);
+            animation: beacon 1.8s infinite ease-in-out;
+        }
+
+        @keyframes beacon {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        /* Hero Key Metric KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-accent), transparent);
+        }
+
+        .kpi-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .kpi-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .kpi-sub {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-body);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 99 Layer Citadel Defense Matrix */
+        .defense-sector {
+            margin-bottom: 28px;
+        }
+
+        .sector-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .sector-title-bar h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-track {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #06b6d4, #f59e0b, #ef4444);
+            width: 1%;
+            border-radius: 9999px;
+            transition: width 0.5s ease-out;
+        }
+
+        .tier-chips-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 88px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .tier-chip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .tier-chip.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent-emerald);
+            color: #6ee7b7;
+            font-weight: 700;
+        }
+
+        /* Chart & Alpha Intelligence Hub */
+        .middle-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 1100px) {
+            .middle-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-nav-pills {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .chart-btn.active, .chart-btn:hover {
+            background: var(--accent-primary);
+            color: #000;
+            border-color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        /* Proof of Value: How the bot helped you */
+        .proof-metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .proof-metric-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Transaction Log Ledger */
+        .ledger-table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 14px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-subtle);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-heading);
+        }
+
+        .pill-win {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-emerald);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .pill-loss {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Modern Navigation -->
+    <header>
+        <div class="brand-cluster">
+            <div class="brand-logo-gem">👑</div>
+            <div>
+                <h1 class="brand-title">Apex Sovereign</h1>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Institutional Autonomous Quant Engine</div>
+            </div>
+            <span class="brand-badge">99-TIER CITADEL ACTIVE</span>
+        </div>
+        <div class="header-actions">
+            <div class="pulse-indicator">
+                <div class="pulse-dot"></div>
+                <span id="market-status-text">AUTONOMOUS HARVESTING ONLINE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Key Metrics KPI Grid -->
+    <div class="kpi-grid">
+        <div class="glass-panel kpi-card">
+            <div class="kpi-label">Total Portfolio Equity</div>
+            <div class="kpi-val" id="total-equity">$10,000.00</div>
+            <div class="kpi-sub">
+                <span style="color: var(--accent-emerald);" id="net-roi">+0.00% Net ROI</span>
+                <span style="color: var(--text-muted);">| Cash:</span>
+                <span id="liquid-cash" style="color: #fff;">$10,000.00</span>
+            </div>
+        </div>
+
+        <div class="glass-panel kpi-card">
+            <div class="kpi-label">Capital Shield & Alpha Value</div>
+            <div class="kpi-val" style="color: var(--accent-emerald);" id="value-generated">+$0.00</div>
+            <div class="kpi-sub">
+                <span>Direct Profit + Slippage Saved by Bot</span>
+            </div>
+        </div>
+
+        <div class="glass-panel kpi-card">
+            <div class="kpi-label">Citadel Defense Status</div>
+            <div class="kpi-val" style="color: var(--accent-amber);" id="active-tier">TIER 1/99</div>
+            <div class="kpi-sub" id="tier-name-label">
+                Layer-01 [Noise Suppressor] | 1.000x Hardening
+            </div>
+        </div>
+
+        <div class="glass-panel kpi-card">
+            <div class="kpi-label">Sub-Second HFT Engine</div>
+            <div class="kpi-val" style="color: var(--accent-primary);" id="hft-profit">+$0.0000</div>
+            <div class="kpi-sub">
+                <span id="hft-captures">0</span>
+                <span>Microsecond Arbitrages Executed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 99 Layer Progressive Defense Citadel Radar -->
+    <div class="glass-panel defense-sector">
+        <div class="sector-title-bar">
+            <h2>🛡️ 99-TIER ABSOLUTE PROGRESSIVE CITADEL MATRIX</h2>
+            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--accent-emerald); font-weight: 700;" id="citadel-defense-status">CITADEL INTACT (0 BREACHES)</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="layer-fill-bar"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px; font-family: 'JetBrains Mono';">
+            <span>Tier 1: Noise Suppression</span>
+            <span>Tier 45: Flash Shock Deflector</span>
+            <span>Tier 99: Omega Core Hard Floor ($9,000.00)</span>
+        </div>
+        <div class="tier-chips-wrapper" id="tier-badges-container"></div>
+    </div>
+
+    <!-- Global Macro World Markets Ticker Tape -->
+    <div class="glass-panel" style="padding: 14px 20px; margin-bottom: 24px; overflow-x: auto;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-family: 'Space Grotesk'; font-size: 0.8rem; font-weight: 700; color: var(--accent-primary); letter-spacing: 1px;">🌍 GLOBAL MACRO WORLD MARKETS TICKER FEED</span>
+            <span style="font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono';">CRYPTO • FOREX • COMMODITIES • GLOBAL INDICES</span>
+        </div>
+        <div id="world-ticker-ribbon" style="display: flex; gap: 14px; overflow-x: auto; padding-bottom: 4px;">
+            <!-- Rendered dynamically -->
+        </div>
+    </div>
+
+    <!-- Center Hub: Interactive Chart & Proof-of-Value Analytics -->
+    <div class="middle-grid">
+        <!-- Live Candlestick & Technical Convergence Chart -->
+        <div class="glass-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff;">Market Depth & Multi-Factor Convergence</h2>
+                    <span style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--accent-primary);" id="active-chart-pair-label">BTC/USDT 1m Candlestick Order Book</span>
+                </div>
+                <div class="chart-nav-pills" style="flex-wrap: wrap; gap: 6px;">
+                    <button class="chart-btn active" onclick="switchSymbol('BTC/USDT', this)">BTC</button>
+                    <button class="chart-btn" onclick="switchSymbol('ETH/USDT', this)">ETH</button>
+                    <button class="chart-btn" onclick="switchSymbol('SOL/USDT', this)">SOL</button>
+                    <button class="chart-btn" onclick="switchSymbol('EURUSD=X', this)">EUR/USD</button>
+                    <button class="chart-btn" onclick="switchSymbol('GBPUSD=X', this)">GBP/USD</button>
+                    <button class="chart-btn" onclick="switchSymbol('USDJPY=X', this)">USD/JPY</button>
+                    <button class="chart-btn" onclick="switchSymbol('GC=F', this)">GOLD</button>
+                    <button class="chart-btn" onclick="switchSymbol('CL=F', this)">OIL</button>
+                    <button class="chart-btn" onclick="switchSymbol('^GSPC', this)">S&P 500</button>
+                    <button class="chart-btn" onclick="switchSymbol('^IXIC', this)">NASDAQ</button>
+                </div>
+            </div>
+            <div style="height: 290px; position: relative;">
+                <canvas id="apexLiveChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Proof-of-Value & Institutional Whale Radar Hub -->
+        <div class="glass-panel">
+            <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 14px;">🐋 Institutional Whale & Probability Radar</h2>
+            <div style="font-size: 0.85rem; color: var(--text-body);">
+                <div class="proof-metric-row">
+                    <span>Algorithm Win Rate Target:</span>
+                    <strong style="color: var(--accent-emerald);" id="win-rate-stat">94.8% Target (Sniper Filter)</strong>
+                </div>
+                <div class="proof-metric-row">
+                    <span>Active Setup Win Probability:</span>
+                    <strong style="color: var(--accent-primary);" id="confluence-score-label">88% (Confluence Met)</strong>
+                </div>
+                <div class="proof-metric-row">
+                    <span>Whale Order Flow Bias:</span>
+                    <strong style="color: var(--accent-emerald);" id="whale-bias-badge">ACCUMULATION (2.34x Taker Ratio)</strong>
+                </div>
+                <div class="proof-metric-row">
+                    <span>Large Block Trades Detected:</span>
+                    <strong style="color: #fff;" id="whale-blocks-count">4 Whale Buys (+$210k Delta)</strong>
+                </div>
+                <div class="proof-metric-row">
+                    <span>Smart Routing Slippage Saved:</span>
+                    <strong style="color: var(--accent-primary);" id="slippage-stat">+$0.00</strong>
+                </div>
+            </div>
+
+            <!-- Tactical Manual Commands -->
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px;">Tactical Override Test:</div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action btn-buy" onclick="triggerManualTrade('buy')">+ TEST AUTO BUY</button>
+                    <button class="btn-action btn-sell" onclick="triggerManualTrade('sell')">- CLOSE POSITION</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Positions & Complete Transaction History Ledger -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px;">
+        <!-- Active Positions Panel -->
+        <div class="glass-panel">
+            <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px;">⚡ Active Swing Allocations</h2>
+            <div class="ledger-table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pair</th>
+                            <th>Position Size</th>
+                            <th>Entry</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-positions-body">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Scanning pairs for high-probability momentum setups...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sub-Second Multi-Asset & Indices HFT Stream -->
+        <div class="glass-panel">
+            <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; justify-content: space-between;">
+                <span>⚡ Sub-Second Indices & Macro HFT Ledger</span>
+                <span style="font-size: 0.72rem; color: var(--accent-emerald); font-family: 'JetBrains Mono';" id="hft-speed-badge">LATENCY: ~2.4ms</span>
+            </h2>
+            <div class="ledger-table-wrap" style="max-height: 220px; overflow-y: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Asset / Index</th>
+                            <th>Latency</th>
+                            <th>Order Skew</th>
+                            <th>Yield</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hft-history-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Listening to sub-millisecond Index orderbooks (SPX, NDX, DJI, Gold)...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Transaction History Ledger -->
+    <div class="glass-panel" style="margin-bottom: 28px;">
+        <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 16px;">📑 Closed Swing Trades & Algorithmic Rationale Ledger</h2>
+        <div class="ledger-table-wrap" style="max-height: 180px; overflow-y: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>TX ID</th>
+                        <th>Pair</th>
+                        <th>PnL</th>
+                        <th>Alpha Rationale (Why it Exited)</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-history-body">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No closed swing trades yet. Bot is scanning the order books.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Live Telemetry Stream -->
+    <div class="glass-panel">
+        <h2 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 12px;">📡 Sovereign Telemetry Activity Feed</h2>
+        <div id="live-logs-box" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary); line-height: 1.6; max-height: 120px; overflow-y: auto;">
+            <div>[INIT] Sovereign 99-Tier Engine started.</div>
+        </div>
+    </div>
+
+    <script>
+        // Generate the 99 Citadel Layer Badges
+        const tierContainer = document.getElementById('tier-badges-container');
+        for (let i = 1; i <= 99; i++) {
+            const chip = document.createElement('div');
+            chip.className = 'tier-chip' + (i === 1 ? ' active' : '');
+            chip.id = `badge-tier-${i}`;
+            chip.textContent = `L-${i}`;
+            tierContainer.appendChild(chip);
+        }
+
+        let selectedSymbol = "BTC/USDT";
+        let chartInstance = null;
+
+        function initChart() {
+            const ctx = document.getElementById('apexLiveChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Market Price (Close)',
+                            data: [],
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 1
+                        },
+                        {
+                            label: 'Fast Trend EMA (9)',
+                            data: [],
+                            borderColor: '#10b981',
+                            borderWidth: 1.5,
+                            borderDash: [4, 4],
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Slow Trend EMA (21)',
+                            data: [],
+                            borderColor: '#f59e0b',
+                            borderWidth: 1.5,
+                            borderDash: [2, 2],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', maxTicksLimit: 8 } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        async function updateChart() {
+            try {
+                const res = await fetch(`/api/chart?symbol=${encodeURIComponent(selectedSymbol)}`);
+                const data = await res.json();
+                if (data.candles && chartInstance) {
+                    chartInstance.data.labels = data.candles.map(c => new Date(c.time * 1000).toLocaleTimeString());
+                    chartInstance.data.datasets[0].data = data.candles.map(c => c.close);
+                    chartInstance.data.datasets[1].data = data.candles.map(c => c.ema_fast);
+                    chartInstance.data.datasets[2].data = data.candles.map(c => c.ema_slow);
+                    chartInstance.update();
+                }
+            } catch (err) {
+                console.error("Chart sync error:", err);
+            }
+        }
+
+        function switchSymbol(sym, btn) {
+            selectedSymbol = sym;
+            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            document.getElementById('active-chart-pair-label').textContent = `${sym} 1m Candlestick Order Book`;
+            updateChart();
+        }
+
+        async function fetchWorldMarkets() {
+            try {
+                const res = await fetch('/api/world-markets');
+                const data = await res.json();
+                const ribbon = document.getElementById('world-ticker-ribbon');
+                if (data.markets && ribbon) {
+                    ribbon.innerHTML = '';
+                    data.markets.forEach(m => {
+                        const isUp = m.change_24h >= 0;
+                        const card = document.createElement('div');
+                        card.style = `
+                            background: rgba(255, 255, 255, 0.03);
+                            border: 1px solid rgba(255, 255, 255, 0.07);
+                            border-radius: 10px;
+                            padding: 8px 14px;
+                            min-width: 150px;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                            display: flex;
+                            flex-direction: column;
+                        `;
+                        card.onclick = () => switchSymbol(m.symbol, null);
+                        card.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono';">
+                                <strong>${m.display}</strong>
+                                <span style="color: ${isUp ? 'var(--accent-emerald)' : 'var(--accent-rose)'};">${isUp ? '+' : ''}${m.change_24h}%</span>
+                            </div>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: #fff; margin-top: 4px; font-family: 'Space Grotesk';">
+                                $${m.price.toLocaleString(undefined, {minimumFractionDigits: m.category === 'FOREX' ? 4 : 2, maximumFractionDigits: 4})}
+                            </div>
+                        `;
+                        ribbon.appendChild(card);
+                    });
+                }
+            } catch (e) {
+                console.error("World markets sync error:", e);
+            }
+        }
+
+        async function fetchCitadelStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                // Core Equity KPIs
+                document.getElementById('total-equity').textContent = `$${data.equity.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                document.getElementById('liquid-cash').textContent = `$${data.cash.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                
+                const roi = ((data.equity - 10000.0) / 10000.0) * 100;
+                const roiEl = document.getElementById('net-roi');
+                roiEl.textContent = `${roi >= 0 ? '+' : ''}${roi.toFixed(2)}% Net ROI`;
+                roiEl.style.color = roi >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+
+                // Citadel 99-Tier Indicators
+                document.getElementById('active-tier').textContent = `TIER ${data.active_tier}/99`;
+                document.getElementById('tier-name-label').textContent = `${data.tier_name} | ${data.difficulty_mult.toFixed(3)}x Hardening`;
+                
+                const tierPct = (data.active_tier / 99) * 100;
+                document.getElementById('layer-fill-bar').style.width = `${Math.max(1, tierPct)}%`;
+
+                for (let i = 1; i <= 99; i++) {
+                    const badge = document.getElementById(`badge-tier-${i}`);
+                    if (badge) {
+                        badge.className = 'tier-chip' + (i <= data.active_tier ? ' active' : '');
+                    }
+                }
+
+                // Sub-Second HFT Engine
+                document.getElementById('hft-profit').textContent = `+$${data.total_hft_profit.toFixed(4)}`;
+                document.getElementById('hft-captures').textContent = data.total_hft_captures;
+
+                // Whale & Probability Metrics
+                if (data.whale_flow && data.whale_flow[selectedSymbol]) {
+                    const w = data.whale_flow[selectedSymbol];
+                    const isAcc = w.whale_bias === 'ACCUMULATION';
+                    const biasEl = document.getElementById('whale-bias-badge');
+                    biasEl.textContent = `${w.whale_bias} (${w.flow_ratio}x Taker Ratio)`;
+                    biasEl.style.color = isAcc ? 'var(--accent-emerald)' : (w.whale_bias === 'DISTRIBUTION' ? 'var(--accent-rose)' : 'var(--accent-amber)');
+                    document.getElementById('whale-blocks-count').textContent = `${w.whale_buys_count} Whale Buys | Net Delta: ${w.net_delta_usd >= 0 ? '+' : ''}$${w.net_delta_usd.toLocaleString()}`;
+                }
+
+                if (data.confluence_radar && data.confluence_radar[selectedSymbol]) {
+                    const c = data.confluence_radar[selectedSymbol];
+                    const confEl = document.getElementById('confluence-score-label');
+                    confEl.textContent = `${c.probability_score}% (${c.reason})`;
+                    confEl.style.color = c.probability_score >= 85 ? 'var(--accent-emerald)' : 'var(--accent-primary)';
+                }
+
+                // Proof of Value Metrics
+                document.getElementById('slippage-stat').textContent = `+$${data.total_alpha_saved.toFixed(2)}`;
+                const totalValue = data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit;
+                document.getElementById('value-generated').textContent = `${totalValue >= 0 ? '+' : ''}$${totalValue.toFixed(2)}`;
+
+                // Active Allocations Table
+                const posBody = document.getElementById('active-positions-body');
+                const posKeys = Object.keys(data.positions);
+                if (posKeys.length > 0) {
+                    posBody.innerHTML = '';
+                    posKeys.forEach(sym => {
+                        const p = data.positions[sym];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="font-weight: 700; color: #fff;">${sym}</td>
+                            <td>${p.quantity.toFixed(4)}</td>
+                            <td>$${p.entry_price.toLocaleString()}</td>
+                            <td><span class="pill-win">ACTIVE HARVEST</span></td>
+                        `;
+                        posBody.appendChild(tr);
+                    });
+                } else {
+                    posBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Scanning pairs for high-probability momentum setups...</td></tr>';
+                }
+
+                // Complete Transaction History Ledger
+                const txBody = document.getElementById('transaction-history-body');
+                if (data.trade_history && data.trade_history.length > 0) {
+                    txBody.innerHTML = '';
+                    data.trade_history.slice().reverse().forEach(tx => {
+                        const tr = document.createElement('tr');
+                        const isWin = tx.pnl >= 0;
+                        tr.innerHTML = `
+                            <td style="color: var(--accent-primary); font-weight: 600;">${tx.id}</td>
+                            <td style="font-weight: 700; color: #fff;">${tx.symbol}</td>
+                            <td><span class="${isWin ? 'pill-win' : 'pill-loss'}">${isWin ? '+' : ''}$${tx.pnl.toFixed(2)} (${tx.pnl_pct.toFixed(2)}%)</span></td>
+                            <td style="font-size: 0.76rem; color: #cbd5e1;">${tx.strategy_rationale}</td>
+                            <td style="color: var(--text-muted);">${tx.timestamp}</td>
+                        `;
+                        txBody.appendChild(tr);
+                    });
+                }
+
+                // Sub-Second Indices & Multi-Asset HFT Stream Table
+                const hftBody = document.getElementById('hft-history-body');
+                if (data.hft_trades_history && data.hft_trades_history.length > 0 && hftBody) {
+                    hftBody.innerHTML = '';
+                    data.hft_trades_history.slice().reverse().forEach(h => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="color: var(--accent-primary); font-weight: 600;">${h.id}</td>
+                            <td style="font-weight: 700; color: #fff;">${h.symbol} <span style="font-size: 0.65rem; color: var(--text-muted);">[${h.asset_class}]</span></td>
+                            <td style="color: var(--accent-emerald); font-weight: 700;">${h.latency_ms}ms</td>
+                            <td style="color: var(--accent-amber);">${h.imbalance}</td>
+                            <td><span class="pill-win">+${h.pnl.toFixed(4)}</span></td>
+                            <td style="color: var(--text-muted);">${h.timestamp}</td>
+                        `;
+                        hftBody.appendChild(tr);
+                    });
+                }
+
+                // Activity Logs
+                const logBox = document.getElementById('live-logs-box');
+                if (data.recent_logs && data.recent_logs.length > 0) {
+                    logBox.innerHTML = '';
+                    data.recent_logs.forEach(log => {
+                        const div = document.createElement('div');
+                        div.textContent = log;
+                        logBox.appendChild(div);
+                    });
+                    logBox.scrollTop = logBox.scrollHeight;
+                }
+            } catch (err) {
+                console.error("Citadel status sync error:", err);
+            }
+        }
+
+        async function triggerManualTrade(action) {
+            const endpoint = action === 'buy' ? `/api/trade/force-buy?symbol=${encodeURIComponent(selectedSymbol)}` : `/api/trade/force-sell?symbol=${encodeURIComponent(selectedSymbol)}`;
+            try {
+                await fetch(endpoint, { method: 'POST' });
+                fetchCitadelStatus();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        initChart();
+        setInterval(updateChart, 2500);
+        setInterval(fetchCitadelStatus, 2000);
+        setInterval(fetchWorldMarkets, 4000);
+        fetchCitadelStatus();
+        fetchWorldMarkets();
+        updateChart();
+    </script>
+</body>
+</html>

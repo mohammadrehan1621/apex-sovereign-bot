@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: apex-sovereign-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.web.server
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: MODE
+        value: PAPER
+      - key: INITIAL_CAPITAL_USDT
+        value: 10000.0
+      - key: INSOLVENCY_FLOOR_USDT
+        value: 9000.0
