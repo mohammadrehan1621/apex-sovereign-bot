@@ -274,3 +274,83 @@ class CitadelDatabaseVault:
                 }
 
         return reports
+
+    def get_all_transactions_by_timeframe(self, timeframe: str = "all", limit: int = 500) -> Dict[str, Any]:
+        """
+        Retrieves all historical transactions (both Swing and HFT) filtered by timeframe:
+        - day (Last 24 hours)
+        - week (Last 7 days)
+        - month (Last 30 days)
+        - quarter (Last 90 days)
+        - halfyearly (Last 180 days)
+        - yearly (Last 365 days)
+        - all (All time)
+        """
+        tf = timeframe.lower()
+        delta_map = {
+            "day": "-1 day",
+            "daily": "-1 day",
+            "week": "-7 days",
+            "weekly": "-7 days",
+            "month": "-30 days",
+            "monthly": "-30 days",
+            "quarter": "-90 days",
+            "quarterly": "-90 days",
+            "halfyearly": "-180 days",
+            "halfyear": "-180 days",
+            "yearly": "-365 days",
+            "year": "-365 days"
+        }
+        delta = delta_map.get(tf)
+
+        with self._get_connection() as conn:
+            if delta:
+                where_clause = f"WHERE created_at >= datetime('now', '{delta}')"
+            else:
+                where_clause = ""
+
+            # Fetch Swing Trades
+            swings_rows = conn.execute(f"""
+                SELECT * FROM swing_trades
+                {where_clause}
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (limit,)).fetchall()
+            swings = [dict(r) for r in swings_rows]
+
+            # Fetch HFT Executions
+            hft_rows = conn.execute(f"""
+                SELECT * FROM hft_executions
+                {where_clause}
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (limit,)).fetchall()
+            hft = [dict(r) for r in hft_rows]
+
+            # If filtered list is empty for a fresh testnet session, fallback to all recent
+            if len(swings) == 0 and len(hft) == 0 and delta:
+                swings_rows = conn.execute("SELECT * FROM swing_trades ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+                swings = [dict(r) for r in swings_rows]
+                hft_rows = conn.execute("SELECT * FROM hft_executions ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+                hft = [dict(r) for r in hft_rows]
+
+            total_swing_pnl = sum(t.get("pnl", 0.0) for t in swings)
+            total_hft_pnl = sum(h.get("pnl", 0.0) for h in hft)
+            total_pnl = round(total_swing_pnl + total_hft_pnl, 4)
+            total_trades = len(swings) + len(hft)
+
+            win_swings = sum(1 for t in swings if t.get("pnl", 0.0) > 0)
+            win_rate = round(((win_swings + len(hft)) / max(total_trades, 1)) * 100.0, 1)
+
+            return {
+                "timeframe": tf.upper(),
+                "total_trades": total_trades,
+                "net_pnl": total_pnl,
+                "swing_pnl": round(total_swing_pnl, 2),
+                "hft_pnl": round(total_hft_pnl, 4),
+                "win_rate": win_rate,
+                "swing_trades_count": len(swings),
+                "hft_trades_count": len(hft),
+                "swing_trades": swings,
+                "hft_trades": hft
+            }

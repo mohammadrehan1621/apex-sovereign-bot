@@ -9,17 +9,20 @@ import pandas as pd
 from src.config import BotConfig
 from src.main import SovereignTerminalEngine
 from src.execution.macro_nexus import GlobalMacroDataNexus
+from src.agents.swarm import AgentSwarmOrchestrator
 
 app = FastAPI(title="Apex Sovereign Web Terminal")
 
-# Global engine reference
+# Global engine and AI swarm reference
 config = BotConfig()
 engine = SovereignTerminalEngine(config)
 macro_nexus = GlobalMacroDataNexus()
+swarm = AgentSwarmOrchestrator()
 recent_logs = [
     "[INIT] Sovereign 99-Tier Engine started.",
     "[DEFENSE] Citadel 99-layer matrix engaged.",
-    "[STATUS] Paper Trading Simulation active with $10,000 USDT."
+    "[STATUS] Paper Trading Simulation active with $10,000 USDT.",
+    "[AI-SWARM] 5 Autonomous Agents Initialized (Research, News, Chart, Risk, Trader)."
 ]
 
 # Override alert emitter to push into web feed
@@ -132,6 +135,26 @@ async def get_status():
 @app.get("/api/reports")
 async def get_performance_reports():
     return engine.router.db.get_pnl_reports()
+
+@app.get("/api/ledgers/transactions")
+async def get_all_transactions(timeframe: str = "all", limit: int = 500):
+    return engine.router.db.get_all_transactions_by_timeframe(timeframe=timeframe, limit=limit)
+
+@app.get("/api/agents/status")
+async def get_agents_status(symbol: str = "BTC/USDT"):
+    tier = getattr(engine.defense.matrix, "active_layer_index", 1)
+    return await swarm.get_swarm_consensus(
+        symbol=symbol,
+        current_focus=engine.config.BOT_MARKET_FOCUS,
+        current_tier=tier,
+        cooldown=engine.defense.cooldown_active
+    )
+
+@app.post("/api/agents/run-postmortem")
+async def trigger_agent_postmortem(reason: str = "User Calibration"):
+    result = swarm.trigger_postmortem_learning(reason)
+    recent_logs.append(f"[SWARM-AI] Agent 5 completed self-healing post-mortem: {result['event']}.")
+    return {"status": "SUCCESS", "postmortem": result}
 
 @app.get("/api/bot/focus")
 async def get_bot_focus():
