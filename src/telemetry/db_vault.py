@@ -162,6 +162,7 @@ class CitadelDatabaseVault:
         - YEARLY (Last 365 Days)
         """
         intervals = {
+            "hourly": "-1 hour",
             "daily": "-1 day",
             "weekly": "-7 days",
             "monthly": "-30 days",
@@ -241,15 +242,16 @@ class CitadelDatabaseVault:
                 win_rate = round(((swings["wins"] + hft_trades) / max(total_trades, 1)) * 100.0, 1)
 
                 # 3. Time Series Timeline for Charting
+                date_expr = "strftime('%H:%M', created_at)" if key in ["hourly", "daily"] else "DATE(created_at)"
                 timeline_rows = conn.execute(f"""
                     SELECT 
-                        DATE(created_at) as trade_date,
+                        {date_expr} as trade_date,
                         COALESCE(SUM(pnl), 0.0) as day_pnl,
                         COUNT(*) as count
                     FROM hft_executions
                     WHERE created_at >= datetime('now', '{delta}')
-                    GROUP BY DATE(created_at)
-                    ORDER BY trade_date ASC
+                    GROUP BY {date_expr}
+                    ORDER BY created_at ASC
                 """).fetchall()
 
                 timeline = [{"date": r["trade_date"], "pnl": round(r["day_pnl"], 2), "trades": r["count"]} for r in timeline_rows]

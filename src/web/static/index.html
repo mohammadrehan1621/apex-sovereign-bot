@@ -961,6 +961,307 @@
                 padding: 30px !important;
             }
         }
+        /* Currency Toggle Cluster (INR vs USD) */
+        .currency-toggle-cluster {
+            display: flex;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-subtle);
+            border-radius: 9999px;
+            padding: 2px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .currency-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .currency-btn:hover {
+            color: #fff;
+        }
+
+        .currency-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Header Utility Buttons */
+        .header-calc-btn, .header-binance-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 9999px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+        }
+
+        .header-calc-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .header-binance-btn:hover {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: var(--accent-amber);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Floating Calculator Dock Button */
+        .floating-action-calc {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.45);
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .floating-action-calc:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(2, 132, 199, 0.6);
+        }
+
+        /* Global Modal Backdrop & Window */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: #0d121e;
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 620px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            padding: 28px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 14px;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(244, 63, 94, 0.2);
+            color: var(--accent-rose);
+            border-color: var(--accent-rose);
+        }
+
+        /* Calculator Specific Styles */
+        .calc-display-wrap {
+            background: #060911;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .calc-display-expr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            min-height: 20px;
+            word-break: break-all;
+        }
+
+        .calc-display-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            line-height: 1.1;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .calc-keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .calc-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 12px 0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .calc-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .calc-btn:active {
+            transform: translateY(1px);
+        }
+
+        .calc-btn.op {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-primary);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .calc-btn.eq {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+            font-weight: 700;
+        }
+
+        .calc-btn.clear {
+            background: rgba(244, 63, 94, 0.12);
+            color: var(--accent-rose);
+            border-color: rgba(244, 63, 94, 0.3);
+        }
+
+        .calc-quick-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .calc-quick-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calc-quick-chip:hover {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--accent-emerald);
+            color: #6ee7b7;
+        }
+
+        /* Position Sizing Calculator Fields */
+        .pos-calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .pos-field label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .pos-field input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .pos-field input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .pos-result-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
     </style>
 </head>
 <body>
@@ -970,11 +1271,27 @@
             <div class="brand-logo-gem">👑</div>
             <div>
                 <h1 class="brand-title">Apex Sovereign</h1>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Institutional Autonomous Quant Engine</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Trading Autonomous AI Engine</div>
             </div>
-            <span class="brand-badge">99-TIER CITADEL ACTIVE</span>
+            <span class="brand-badge" style="cursor: pointer;" onclick="openCitadelModal()" title="Click to view 99-Tier Citadel Matrix Explainer">🛡️ 99-TIER CITADEL ACTIVE</span>
         </div>
         <div class="header-actions">
+            <!-- Universal Currency Switcher: INR (Default) vs USD -->
+            <div class="currency-toggle-cluster" title="Toggle universal display currency between Indian Rupees (₹) and US Dollars ($)">
+                <button class="currency-btn active" id="curr-btn-inr" onclick="setGlobalCurrency('INR')">🇮🇳 ₹ INR</button>
+                <button class="currency-btn" id="curr-btn-usd" onclick="setGlobalCurrency('USD')">🇺🇸 $ USD</button>
+            </div>
+
+            <!-- Quick In-Built Calculator Trigger -->
+            <button class="header-calc-btn" onclick="toggleCalcModal()" title="Open In-Built AI Quant & Financial Calculator">
+                🧮 Calculator
+            </button>
+
+            <!-- Binance Gateway Modal Trigger -->
+            <button class="header-binance-btn" onclick="openBinanceModal()" title="Binance API & Live Order Routing Gateway">
+                🟡 Binance Setup
+            </button>
+
             <div class="mode-badge-pill" title="Live real-time market feeds connected to Binance & Yahoo Finance. Orders executed on Paper Testnet simulation to protect capital while verifying alpha.">
                 <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent-emerald); font-weight: 700;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald);"></span>
@@ -1088,7 +1405,7 @@
                 <span style="color: var(--text-muted);">| Cash:</span>
                 <span id="liquid-cash" style="color: #fff;">$10,000.00</span>
                 <span style="color: var(--text-muted);">| Orig. Base:</span>
-                <span style="color: #94a3b8;">$10,000.00</span>
+                <span id="orig-base" style="color: #94a3b8;">$10,000.00</span>
             </div>
         </div>
 
@@ -1362,6 +1679,7 @@
                     </div>
                 </div>
                 <div class="timeframe-bar" style="margin-bottom: 0;">
+                    <button class="timeframe-btn" id="tf-hourly" onclick="selectReportTimeframe('hourly')">⏱️ Hourly (Last 60m)</button>
                     <button class="timeframe-btn active" id="tf-daily" onclick="selectReportTimeframe('daily')">📅 Daily (24h / Today)</button>
                     <button class="timeframe-btn" id="tf-weekly" onclick="selectReportTimeframe('weekly')">📆 Weekly (7 Days)</button>
                     <button class="timeframe-btn" id="tf-monthly" onclick="selectReportTimeframe('monthly')">🗓️ Monthly (30 Days)</button>
@@ -1915,6 +2233,249 @@
         </div>
     </div>
 
+    <!-- Floating Action Quick Calculator Dock -->
+    <div class="floating-action-calc" id="floating-calc-btn" onclick="toggleCalcModal()" title="Open In-Built AI Quant & Financial Calculator">
+        🧮
+    </div>
+
+    <!-- MODAL 1: IN-BUILT AI QUANT & FINANCIAL CALCULATOR -->
+    <div class="modal-backdrop" id="calc-modal" style="display: none;" onclick="if(event.target === this) toggleCalcModal()">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🧮</span>
+                    <span>AI Autonomous Financial Calculator</span>
+                </div>
+                <button class="modal-close-btn" onclick="toggleCalcModal()">✕</button>
+            </div>
+
+            <!-- Calculator Sub-Tabs -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <button class="timeframe-btn active" id="calc-tab-math" style="flex: 1;" onclick="switchCalcMode('math')">
+                    🔢 Quick Trading Math
+                </button>
+                <button class="timeframe-btn" id="calc-tab-pos" style="flex: 1;" onclick="switchCalcMode('position')">
+                    🎯 Position Sizing (₹ INR)
+                </button>
+            </div>
+
+            <!-- Mode 1: Math Keypad -->
+            <div id="calc-view-math">
+                <div class="calc-display-wrap">
+                    <div class="calc-display-expr" id="calc-expr">0</div>
+                    <div class="calc-display-val" id="calc-val">0</div>
+                </div>
+
+                <!-- Quick Trading Percentage Chips -->
+                <div class="calc-quick-row">
+                    <button class="calc-quick-chip" onclick="calcQuickPct(5)">+5% Target</button>
+                    <button class="calc-quick-chip" onclick="calcQuickPct(10)">+10% Target</button>
+                    <button class="calc-quick-chip" onclick="calcQuickPct(25)">+25% Alpha</button>
+                    <button class="calc-quick-chip" onclick="calcQuickMult(2)">2x Leverage</button>
+                    <button class="calc-quick-chip" onclick="calcQuickMult(5)">5x Leverage</button>
+                    <button class="calc-quick-chip" onclick="calcQuickMult(10)">10x Leverage</button>
+                </div>
+
+                <!-- Keypad -->
+                <div class="calc-keypad">
+                    <button class="calc-btn clear" onclick="calcPress('C')">C</button>
+                    <button class="calc-btn" onclick="calcPress('DEL')">⌫</button>
+                    <button class="calc-btn op" onclick="calcPress('%')">%</button>
+                    <button class="calc-btn op" onclick="calcPress('/')">÷</button>
+
+                    <button class="calc-btn" onclick="calcPress('7')">7</button>
+                    <button class="calc-btn" onclick="calcPress('8')">8</button>
+                    <button class="calc-btn" onclick="calcPress('9')">9</button>
+                    <button class="calc-btn op" onclick="calcPress('*')">×</button>
+
+                    <button class="calc-btn" onclick="calcPress('4')">4</button>
+                    <button class="calc-btn" onclick="calcPress('5')">5</button>
+                    <button class="calc-btn" onclick="calcPress('6')">6</button>
+                    <button class="calc-btn op" onclick="calcPress('-')">-</button>
+
+                    <button class="calc-btn" onclick="calcPress('1')">1</button>
+                    <button class="calc-btn" onclick="calcPress('2')">2</button>
+                    <button class="calc-btn" onclick="calcPress('3')">3</button>
+                    <button class="calc-btn op" onclick="calcPress('+')">+</button>
+
+                    <button class="calc-btn" onclick="calcPress('+/-')">±</button>
+                    <button class="calc-btn" onclick="calcPress('0')">0</button>
+                    <button class="calc-btn" onclick="calcPress('.')">.</button>
+                    <button class="calc-btn eq" onclick="calcPress('=')">=</button>
+                </div>
+            </div>
+
+            <!-- Mode 2: Position Sizing & Risk/Reward in INR -->
+            <div id="calc-view-position" style="display: none;">
+                <div class="pos-calc-grid">
+                    <div class="pos-field">
+                        <label>Account Equity (₹ INR)</label>
+                        <input type="number" id="pos-capital" value="865000" oninput="runPositionCalc()">
+                    </div>
+                    <div class="pos-field">
+                        <label>Risk Per Trade (%)</label>
+                        <input type="number" id="pos-risk-pct" value="2.0" step="0.5" oninput="runPositionCalc()">
+                    </div>
+                    <div class="pos-field">
+                        <label>Entry Price (₹ / $)</label>
+                        <input type="number" id="pos-entry" value="65000" oninput="runPositionCalc()">
+                    </div>
+                    <div class="pos-field">
+                        <label>Stop Loss Price</label>
+                        <input type="number" id="pos-stop" value="63700" oninput="runPositionCalc()">
+                    </div>
+                    <div class="pos-field" style="grid-column: span 2;">
+                        <label>Take Profit Target Price</label>
+                        <input type="number" id="pos-target" value="68900" oninput="runPositionCalc()">
+                    </div>
+                </div>
+
+                <div class="pos-result-box">
+                    <div style="font-family: 'Space Grotesk'; font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 10px;">
+                        📊 Sizing & Risk/Reward Breakdown
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem;">
+                        <div>
+                            <span style="color: var(--text-muted);">Max Risk Amount:</span>
+                            <strong style="color: var(--accent-rose); display: block;" id="pos-res-risk">₹17,300.00</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Target Profit:</span>
+                            <strong style="color: var(--accent-emerald); display: block;" id="pos-res-profit">₹52,000.00</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Recommended Size:</span>
+                            <strong style="color: var(--accent-primary); display: block;" id="pos-res-size">13.31 Units</strong>
+                        </div>
+                        <div>
+                            <span style="color: var(--text-muted);">Risk-to-Reward:</span>
+                            <strong style="color: var(--accent-amber); display: block;" id="pos-res-rr">1 : 3.00 R:R</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: BINANCE API GATEWAY & LIVE TRADING SETUP -->
+    <div class="modal-backdrop" id="binance-modal" style="display: none;" onclick="if(event.target === this) closeBinanceModal()">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span style="color: #f59e0b;">🟡</span>
+                    <span>Binance Exchange Live Trading Gateway</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeBinanceModal()">✕</button>
+            </div>
+            
+            <div style="font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin-bottom: 18px;">
+                Apex Sovereign features direct native integration with <strong>Binance Spot & Futures</strong> via CCXT low-latency WebSockets. Follow these steps to activate real trading:
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
+                    <div style="font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px;">1. Generate Binance API Key & Secret</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+                        Log in to Binance → <em>Account → API Management</em>. Create a new API key. Enable <strong>Read Info</strong> and <strong>Spot & Margin Trading</strong> (or USD-M Futures). Never share your Secret Key with anyone.
+                    </div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
+                    <div style="font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px;">2. Add Credentials to Bot Environment</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+                        Open your <code style="color: var(--accent-primary);">.env</code> file or <code style="color: var(--accent-primary);">src/config.py</code> and set:
+                        <pre style="background: #060911; padding: 8px 12px; border-radius: 6px; margin-top: 6px; color: var(--accent-emerald); font-family: 'JetBrains Mono'; font-size: 0.72rem;">EXCHANGE_API_KEY="your_binance_api_key_here"
+EXCHANGE_API_SECRET="your_binance_api_secret_here"</pre>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
+                    <div style="font-weight: 700; color: #fff; font-size: 0.9rem; margin-bottom: 4px;">3. Switch from PAPER to LIVE Mode</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+                        In <code style="color: var(--accent-primary);">src/config.py</code>, set <code style="color: var(--accent-amber);">MODE = "LIVE"</code> and <code style="color: var(--accent-amber);">SANDBOX = False</code>. The engine will authenticate with Binance and execute real orders on live exchange books.
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-weight: 700; color: var(--accent-emerald); font-size: 0.85rem;">Exchange Driver Status:</div>
+                    <div style="font-size: 0.75rem; color: var(--text-body);">CCXT Binance Protocol Loaded (v4.4.52)</div>
+                </div>
+                <span class="brand-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);">READY FOR LIVE KEYS</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CITADEL 99-TIER DEFENSE MATRIX DEEP DIVE -->
+    <div class="modal-backdrop" id="citadel-modal" style="display: none;" onclick="if(event.target === this) closeCitadelModal()">
+        <div class="modal-card" style="max-width: 680px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🛡️</span>
+                    <span>99-Tier Absolute Citadel Defense Matrix</span>
+                </div>
+                <button class="modal-close-btn" onclick="closeCitadelModal()">✕</button>
+            </div>
+            
+            <div style="font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin-bottom: 18px;">
+                The Citadel Defense Matrix is an automated 99-layer kinetic risk shield designed to protect capital under extreme volatility, flash crashes, and black swan events:
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: #6ee7b7; font-size: 0.9rem;">ZONE 1: Tiers 1 – 20 [Micro-Volatility & Noise Filters]</strong>
+                        <span class="brand-badge" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">ACTIVE</span>
+                    </div>
+                    <div style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;">
+                        Filters sub-second order book flicker, spread noise, and random retail chop. Ensures trades are only executed when genuine order flow volume is present.
+                    </div>
+                </div>
+
+                <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: var(--accent-primary); font-size: 0.9rem;">ZONE 2: Tiers 21 – 45 [Kinetic Slippage & Dynamic Trailing]</strong>
+                        <span class="brand-badge" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-primary);">STANDBY</span>
+                    </div>
+                    <div style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;">
+                        Monitors order execution slippage. If exchange maker/taker spreads widen, the engine enforces strict limit order fills and dynamically ratchets trailing stops into guaranteed profit.
+                    </div>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: var(--accent-amber); font-size: 0.9rem;">ZONE 3: Tiers 46 – 70 [Flash Shock Deflector & Cooldowns]</strong>
+                        <span class="brand-badge" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-amber);">ARMED</span>
+                    </div>
+                    <div style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;">
+                        Triggers immediate circuit breakers upon detecting sudden liquidity evaporations or 4 consecutive losses. Imposes an automatic tactical cooldown to prevent revenge trading.
+                    </div>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: var(--accent-rose); font-size: 0.9rem;">ZONE 4: Tiers 71 – 90 [De-Leveraging & Drawdown Quench]</strong>
+                        <span class="brand-badge" style="background: rgba(239, 68, 68, 0.2); color: var(--accent-rose);">ARMED</span>
+                    </div>
+                    <div style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;">
+                        Drastically slashes position sizes from 15% down to 3% capital per trade during macro bear cycles. Positions are held in liquid cash to preserve reserves.
+                    </div>
+                </div>
+
+                <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong style="color: #c084fc; font-size: 0.9rem;">ZONE 5: Tiers 91 – 99 [Omega Core Hard Capital Floor ($9k / ₹7.78L)]</strong>
+                        <span class="brand-badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">IMPERVIOUS</span>
+                    </div>
+                    <div style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;">
+                        The absolute mathematical survival threshold. If equity ever touches the hard floor, the system instantly executes emergency position flattening and enters full cryogenic lockdown. Client principal cannot be liquidated.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Generate the 99 Citadel Layer Badges
         const tierContainer = document.getElementById('tier-badges-container');
@@ -1924,6 +2485,225 @@
             chip.id = `badge-tier-${i}`;
             chip.textContent = `L-${i}`;
             tierContainer.appendChild(chip);
+        }
+
+        // Universal Currency Conversion (INR vs USD)
+        let currentCurrency = localStorage.getItem('apex_currency') || 'INR'; // Defaults to INR (₹)
+        const USD_TO_INR_RATE = 86.5;
+
+        function setGlobalCurrency(curr) {
+            currentCurrency = curr;
+            localStorage.setItem('apex_currency', curr);
+
+            const btnInr = document.getElementById('curr-btn-inr');
+            const btnUsd = document.getElementById('curr-btn-usd');
+            if (btnInr && btnUsd) {
+                if (curr === 'INR') {
+                    btnInr.classList.add('active');
+                    btnUsd.classList.remove('active');
+                } else {
+                    btnUsd.classList.add('active');
+                    btnInr.classList.remove('active');
+                }
+            }
+
+            // Sync all components
+            fetchCitadelStatus();
+            if (activeMainTab === 'reports') loadPnlReports();
+            if (activeMainTab === 'calculator') updateCalculator();
+            runPositionCalc();
+        }
+
+        function fmtVal(usdAmount, decimals = 2) {
+            if (usdAmount === null || usdAmount === undefined || isNaN(usdAmount)) return '0.00';
+            const num = Number(usdAmount);
+            if (currentCurrency === 'INR') {
+                const inr = num * USD_TO_INR_RATE;
+                return inr.toLocaleString('en-IN', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            } else {
+                return num.toLocaleString('en-US', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            }
+        }
+
+        function fmtCurr(usdAmount, decimals = 2) {
+            const sym = currentCurrency === 'INR' ? '₹' : '$';
+            const num = Number(usdAmount);
+            const isNeg = num < 0;
+            const absVal = Math.abs(num);
+            return (isNeg ? '-' : '') + sym + fmtVal(absVal, decimals);
+        }
+
+        function fmtCurrSign(usdAmount, decimals = 2) {
+            const sym = currentCurrency === 'INR' ? '₹' : '$';
+            const num = Number(usdAmount);
+            const sign = num >= 0 ? '+' : '-';
+            const absVal = Math.abs(num);
+            return sign + sym + fmtVal(absVal, decimals);
+        }
+
+        // Modal Handlers
+        function toggleCalcModal() {
+            const m = document.getElementById('calc-modal');
+            if (!m) return;
+            m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+            if (m.style.display === 'flex') {
+                runPositionCalc();
+            }
+        }
+
+        function openBinanceModal() {
+            const m = document.getElementById('binance-modal');
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeBinanceModal() {
+            const m = document.getElementById('binance-modal');
+            if (m) m.style.display = 'none';
+        }
+
+        function openCitadelModal() {
+            const m = document.getElementById('citadel-modal');
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeCitadelModal() {
+            const m = document.getElementById('citadel-modal');
+            if (m) m.style.display = 'none';
+        }
+
+        // Calculator Modes
+        function switchCalcMode(mode) {
+            const mathView = document.getElementById('calc-view-math');
+            const posView = document.getElementById('calc-view-position');
+            const tabMath = document.getElementById('calc-tab-math');
+            const tabPos = document.getElementById('calc-tab-pos');
+
+            if (mode === 'math') {
+                if (mathView) mathView.style.display = 'block';
+                if (posView) posView.style.display = 'none';
+                if (tabMath) tabMath.classList.add('active');
+                if (tabPos) tabPos.classList.remove('active');
+            } else {
+                if (mathView) mathView.style.display = 'none';
+                if (posView) posView.style.display = 'block';
+                if (tabMath) tabMath.classList.remove('active');
+                if (tabPos) tabPos.classList.add('active');
+                runPositionCalc();
+            }
+        }
+
+        // Quick Math Pad Execution
+        let calcExprStr = '';
+        let calcCurrVal = '0';
+        let calcResetNext = false;
+
+        function calcPress(key) {
+            const exprEl = document.getElementById('calc-expr');
+            const valEl = document.getElementById('calc-val');
+
+            if (key === 'C') {
+                calcExprStr = '';
+                calcCurrVal = '0';
+            } else if (key === 'DEL') {
+                if (calcCurrVal.length > 1) {
+                    calcCurrVal = calcCurrVal.slice(0, -1);
+                } else {
+                    calcCurrVal = '0';
+                }
+            } else if (key === '+/-') {
+                if (calcCurrVal.startsWith('-')) {
+                    calcCurrVal = calcCurrVal.substring(1);
+                } else if (calcCurrVal !== '0') {
+                    calcCurrVal = '-' + calcCurrVal;
+                }
+            } else if (key === '%') {
+                calcCurrVal = String(parseFloat(calcCurrVal) / 100);
+            } else if (['+', '-', '*', '/'].includes(key)) {
+                calcExprStr = `${calcCurrVal} ${key} `;
+                calcResetNext = true;
+            } else if (key === '=') {
+                if (calcExprStr) {
+                    try {
+                        const fullExpr = calcExprStr + calcCurrVal;
+                        const sanitized = fullExpr.replace(/[^0-9+\-*/.]/g, '');
+                        const res = Function(`'use strict'; return (${sanitized})`)();
+                        calcExprStr = `${fullExpr} =`;
+                        calcCurrVal = String(Number(res.toFixed(6)));
+                    } catch (e) {
+                        calcCurrVal = 'Error';
+                    }
+                    calcResetNext = true;
+                }
+            } else {
+                if (calcCurrVal === '0' || calcResetNext) {
+                    calcCurrVal = key === '.' ? '0.' : key;
+                    calcResetNext = false;
+                } else {
+                    if (key === '.' && calcCurrVal.includes('.')) return;
+                    calcCurrVal += key;
+                }
+            }
+
+            if (exprEl) exprEl.textContent = calcExprStr || '0';
+            if (valEl) valEl.textContent = calcCurrVal;
+        }
+
+        function calcQuickPct(pct) {
+            const val = parseFloat(calcCurrVal) || 0;
+            const res = val * (1 + pct / 100);
+            calcExprStr = `${val} + ${pct}% =`;
+            calcCurrVal = String(Number(res.toFixed(4)));
+            calcResetNext = true;
+            document.getElementById('calc-expr').textContent = calcExprStr;
+            document.getElementById('calc-val').textContent = calcCurrVal;
+        }
+
+        function calcQuickMult(mult) {
+            const val = parseFloat(calcCurrVal) || 0;
+            const res = val * mult;
+            calcExprStr = `${val} × ${mult}x =`;
+            calcCurrVal = String(Number(res.toFixed(4)));
+            calcResetNext = true;
+            document.getElementById('calc-expr').textContent = calcExprStr;
+            document.getElementById('calc-val').textContent = calcCurrVal;
+        }
+
+        // Position Sizing Calculator (₹ INR)
+        function runPositionCalc() {
+            const cap = parseFloat(document.getElementById('pos-capital')?.value) || 0;
+            const riskPct = parseFloat(document.getElementById('pos-risk-pct')?.value) || 0;
+            const entry = parseFloat(document.getElementById('pos-entry')?.value) || 0;
+            const stop = parseFloat(document.getElementById('pos-stop')?.value) || 0;
+            const target = parseFloat(document.getElementById('pos-target')?.value) || 0;
+
+            const riskAmt = cap * (riskPct / 100);
+            const stopDiff = Math.abs(entry - stop);
+            const targetDiff = Math.abs(target - entry);
+
+            let size = 0;
+            if (stopDiff > 0) {
+                size = riskAmt / stopDiff;
+            }
+            const profitAmt = size * targetDiff;
+            const rr = stopDiff > 0 ? (targetDiff / stopDiff).toFixed(2) : '0.00';
+
+            const sym = currentCurrency === 'INR' ? '₹' : '$';
+
+            const riskEl = document.getElementById('pos-res-risk');
+            const profEl = document.getElementById('pos-res-profit');
+            const sizeEl = document.getElementById('pos-res-size');
+            const rrEl = document.getElementById('pos-res-rr');
+
+            if (riskEl) riskEl.textContent = `${sym}${riskAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+            if (profEl) profEl.textContent = `${sym}${profitAmt.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+            if (sizeEl) sizeEl.textContent = `${size.toFixed(4)} Units`;
+            if (rrEl) rrEl.textContent = `1 : ${rr} R:R`;
         }
 
         let selectedSymbol = "BTC/USDT";
@@ -2136,9 +2916,12 @@
                 const data = await res.json();
 
                 // Core Equity KPIs
-                document.getElementById('total-equity').textContent = `$${data.equity.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                document.getElementById('total-equity').textContent = fmtCurr(data.equity);
                 if (document.getElementById('liquid-cash')) {
-                    document.getElementById('liquid-cash').textContent = `$${data.cash.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                    document.getElementById('liquid-cash').textContent = fmtCurr(data.cash);
+                }
+                if (document.getElementById('orig-base')) {
+                    document.getElementById('orig-base').textContent = fmtCurr(10000.0);
                 }
                 
                 const roi = ((data.equity - 10000.0) / 10000.0) * 100;
@@ -2161,7 +2944,7 @@
                 }
 
                 // Sub-Second HFT Engine
-                document.getElementById('hft-profit').textContent = `+$${data.total_hft_profit.toFixed(4)}`;
+                document.getElementById('hft-profit').textContent = fmtCurrSign(data.total_hft_profit, 4);
                 document.getElementById('hft-captures').textContent = data.total_hft_captures;
 
                 // Whale & Probability Metrics
@@ -2171,7 +2954,7 @@
                     const biasEl = document.getElementById('whale-bias-badge');
                     biasEl.textContent = `${w.whale_bias} (${w.flow_ratio}x Taker Ratio)`;
                     biasEl.style.color = isAcc ? 'var(--accent-emerald)' : (w.whale_bias === 'DISTRIBUTION' ? 'var(--accent-rose)' : 'var(--accent-amber)');
-                    document.getElementById('whale-blocks-count').textContent = `${w.whale_buys_count} Whale Buys | Net Delta: ${w.net_delta_usd >= 0 ? '+' : ''}$${w.net_delta_usd.toLocaleString()}`;
+                    document.getElementById('whale-blocks-count').textContent = `${w.whale_buys_count} Whale Buys | Net Delta: ${fmtCurrSign(w.net_delta_usd, 0)}`;
                 }
 
                 if (data.confluence_radar && data.confluence_radar[selectedSymbol]) {
@@ -2182,12 +2965,12 @@
                 }
 
                 // Proof of Value Metrics (Capital Shield & Alpha Value card)
-                document.getElementById('slippage-stat').textContent = `+$${data.total_alpha_saved.toFixed(2)}`;
+                document.getElementById('slippage-stat').textContent = fmtCurrSign(data.total_alpha_saved);
                 const totalAlphaShield = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : ((data.total_realized_profit || 0) + data.total_alpha_saved);
-                document.getElementById('value-generated').textContent = `${totalAlphaShield >= 0 ? '+' : ''}$${totalAlphaShield.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                document.getElementById('value-generated').textContent = fmtCurrSign(totalAlphaShield);
                 if (document.getElementById('profit-breakdown')) {
                     const profitVal = (data.total_realized_profit !== undefined) ? data.total_realized_profit : (data.total_hft_profit || 0);
-                    document.getElementById('profit-breakdown').textContent = `+$${profitVal.toLocaleString('en-US', {minimumFractionDigits: 2})} Realized Profit + $${data.total_alpha_saved.toFixed(2)} Slippage Shield`;
+                    document.getElementById('profit-breakdown').textContent = `${fmtCurrSign(profitVal)} Realized Profit + ${fmtCurr(data.total_alpha_saved)} Slippage Shield`;
                 }
 
                 // Sync Automated Swing Allocations State
@@ -2395,6 +3178,7 @@
             if (activeBtn) activeBtn.classList.add('active');
 
             const tagMap = {
+                hourly: "TIMEFRAME: HOURLY (LAST 60 MINUTES)",
                 daily: "TIMEFRAME: DAILY (24H / TODAY)",
                 weekly: "TIMEFRAME: WEEKLY (LAST 7 DAYS)",
                 monthly: "TIMEFRAME: MONTHLY (LAST 30 DAYS)",
@@ -2415,24 +3199,22 @@
             const rep = cachedReportsData[tf];
 
             // Update KPI cards
-            const pnlSign = rep.net_pnl >= 0 ? '+' : '';
-            document.getElementById('report-net-pnl').textContent = `${pnlSign}$${rep.net_pnl.toFixed(2)}`;
+            document.getElementById('report-net-pnl').textContent = fmtCurrSign(rep.net_pnl);
             document.getElementById('report-net-pnl').style.color = rep.net_pnl >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)';
 
             const roi = (rep.net_pnl / 10000.0 * 100).toFixed(2);
-            document.getElementById('report-pnl-roi').textContent = `${pnlSign}${roi}% Return on $10,000 Capital`;
+            document.getElementById('report-pnl-roi').textContent = `${rep.net_pnl >= 0 ? '+' : ''}${roi}% Return on ${fmtCurr(10000)} Capital`;
 
             document.getElementById('report-win-rate').textContent = `${rep.win_rate.toFixed(1)}%`;
             document.getElementById('report-trades-split').textContent = `${rep.total_trades} Executions (${rep.hft_trades} HFT + ${rep.swing_trades} Sniper)`;
 
             document.getElementById('report-profit-factor').textContent = rep.profit_factor.toFixed(2);
 
-            document.getElementById('report-hft-yield').textContent = `+$${rep.hft_pnl.toFixed(2)}`;
+            document.getElementById('report-hft-yield').textContent = fmtCurrSign(rep.hft_pnl);
             document.getElementById('report-hft-count').textContent = `${rep.hft_trades} Micro-Captures (Avg: ${rep.avg_latency_ms}ms)`;
 
-            const bestSign = rep.best_trade >= 0 ? '+' : '';
-            document.getElementById('report-trade-extremes').textContent = `${bestSign}$${rep.best_trade.toFixed(2)} / $${rep.worst_trade.toFixed(2)}`;
-            document.getElementById('report-alpha-saved').textContent = `Alpha Shield: +$${rep.alpha_saved.toFixed(2)} Saved`;
+            document.getElementById('report-trade-extremes').textContent = `${fmtCurrSign(rep.best_trade)} / ${fmtCurr(rep.worst_trade)}`;
+            document.getElementById('report-alpha-saved').textContent = `Alpha Shield: ${fmtCurrSign(rep.alpha_saved)} Saved`;
 
             // Update Timeline Chart
             if (reportChartInstance) {
@@ -2444,19 +3226,21 @@
                     rep.timeline.forEach(t => {
                         labels.push(t.date);
                         runningTotal += t.pnl;
-                        points.push(runningTotal);
+                        points.push(currentCurrency === 'INR' ? Number((runningTotal * USD_TO_INR_RATE).toFixed(2)) : Number(runningTotal.toFixed(2)));
                     });
                 } else {
-                    const steps = tf === 'daily' ? 12 : (tf === 'weekly' ? 7 : (tf === 'monthly' ? 15 : 12));
+                    const steps = tf === 'hourly' ? 12 : (tf === 'daily' ? 12 : (tf === 'weekly' ? 7 : (tf === 'monthly' ? 15 : 12)));
                     const stepVal = rep.net_pnl / steps;
                     for (let i = 1; i <= steps; i++) {
-                        labels.push(tf === 'daily' ? `${i * 2}h` : `Day ${i}`);
-                        points.push(Number((stepVal * i).toFixed(2)));
+                        labels.push(tf === 'hourly' ? `${i * 5}m` : (tf === 'daily' ? `${i * 2}h` : `Day ${i}`));
+                        const pt = stepVal * i;
+                        points.push(currentCurrency === 'INR' ? Number((pt * USD_TO_INR_RATE).toFixed(2)) : Number(pt.toFixed(2)));
                     }
                 }
 
                 reportChartInstance.data.labels = labels;
                 reportChartInstance.data.datasets[0].data = points;
+                reportChartInstance.data.datasets[0].label = `Cumulative Realized Net P&L (${currentCurrency === 'INR' ? 'INR ₹' : 'USDT $'})`;
                 reportChartInstance.update();
             }
 
@@ -2475,9 +3259,9 @@
                 tr.innerHTML = `
                     <td style="font-weight: 700; color: #fff;">${item.name}</td>
                     <td style="color: var(--accent-primary); font-weight: 600;">${item.trades} trades</td>
-                    <td style="color: var(--accent-emerald);">+$${Number(item.hft).toFixed(2)}</td>
-                    <td style="color: #cbd5e1;">+$${Number(item.swing).toFixed(2)}</td>
-                    <td style="font-weight: 700;"><span class="${isWin ? 'pill-win' : 'pill-loss'}">${isWin ? '+' : ''}$${Number(item.total).toFixed(2)}</span></td>
+                    <td style="color: var(--accent-emerald);">${fmtCurrSign(item.hft)}</td>
+                    <td style="color: #cbd5e1;">${fmtCurrSign(item.swing)}</td>
+                    <td style="font-weight: 700;"><span class="${isWin ? 'pill-win' : 'pill-loss'}">${fmtCurrSign(item.total)}</span></td>
                     <td><span class="brand-badge" style="background: rgba(56, 189, 248, 0.12); color: var(--accent-primary); border-color: rgba(56, 189, 248, 0.4);">${item.status}</span></td>
                 `;
                 tbody.appendChild(tr);
@@ -2657,7 +3441,7 @@
                             ticks: {
                                 color: '#64748b',
                                 font: { family: 'JetBrains Mono', size: 10 },
-                                callback: function(val) { return '$' + Number(val).toLocaleString(); }
+                                callback: function(val) { return fmtCurr(val, 0); }
                             }
                         }
                     },
@@ -2675,7 +3459,7 @@
             const isComp = calcParams.isCompounding;
 
             const capDisp = document.getElementById('calc-disp-capital');
-            if (capDisp) capDisp.textContent = '$' + P.toLocaleString();
+            if (capDisp) capDisp.textContent = fmtCurr(P, 0);
 
             let sovTraj = [P];
             let spTraj = [P];
@@ -2714,11 +3498,11 @@
             const totalProfitEl = document.getElementById('calc-total-profit');
             const monthlyCashflowEl = document.getElementById('calc-monthly-cashflow');
 
-            if (projEquityEl) projEquityEl.textContent = '$' + Math.round(projectedFinal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (projEquityEl) projEquityEl.textContent = fmtCurr(projectedFinal, 2);
             if (roiTagEl) roiTagEl.textContent = `+${netRoi.toFixed(1)}% Net Cumulative ROI`;
-            if (totalProfitEl) totalProfitEl.textContent = '+$' + Math.round(totalProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (totalProfitEl) totalProfitEl.textContent = fmtCurrSign(totalProfit, 2);
             if (monthlyCashflowEl) {
-                monthlyCashflowEl.textContent = isComp ? `Avg Monthly: $${Math.round(monthlyCashflow).toLocaleString()}` : `Paid Out: $${Math.round(totalDividendWithdrawn).toLocaleString()} (50%)`;
+                monthlyCashflowEl.textContent = isComp ? `Avg Monthly: ${fmtCurr(monthlyCashflow, 0)}` : `Paid Out: ${fmtCurr(totalDividendWithdrawn, 0)} (50%)`;
             }
 
             // Update Proposal Summary Card
@@ -2730,14 +3514,14 @@
             const propFloor = document.getElementById('prop-floor');
             const propDate = document.getElementById('prop-date');
 
-            if (propCap) propCap.textContent = '$' + P.toLocaleString() + '.00';
+            if (propCap) propCap.textContent = fmtCurr(P, 2);
             if (propTier) propTier.textContent = tierRates[calcParams.tier].label;
             if (propHorizon) propHorizon.textContent = `${N} Months`;
             if (propModel) propModel.textContent = isComp ? '100% Reinvested' : '50% Monthly Cash Dividend';
-            if (propPnl) propPnl.textContent = '+$' + Math.round(totalProfit).toLocaleString() + '.00 (+' + netRoi.toFixed(1) + '%)';
+            if (propPnl) propPnl.textContent = `${fmtCurrSign(totalProfit, 2)} (+${netRoi.toFixed(1)}%)`;
             if (propFloor) {
                 const floorVal = P * tierRates[calcParams.tier].floor;
-                propFloor.textContent = '$' + Math.round(floorVal).toLocaleString() + '.00 (Tier 99 Floor)';
+                propFloor.textContent = `${fmtCurr(floorVal, 2)} (Tier 99 Floor)`;
             }
             if (propDate) {
                 propDate.textContent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -2747,9 +3531,10 @@
             initCalcChart();
             if (calcChartInstance) {
                 calcChartInstance.data.labels = labels;
-                calcChartInstance.data.datasets[0].data = sovTraj;
-                calcChartInstance.data.datasets[1].data = spTraj;
-                calcChartInstance.data.datasets[2].data = bankTraj;
+                calcChartInstance.data.datasets[0].label = `Apex Sovereign Quant (${currentCurrency === 'INR' ? 'INR ₹' : 'USD $'})`;
+                calcChartInstance.data.datasets[0].data = sovTraj.map(v => currentCurrency === 'INR' ? Math.round(v * USD_TO_INR_RATE) : v);
+                calcChartInstance.data.datasets[1].data = spTraj.map(v => currentCurrency === 'INR' ? Math.round(v * USD_TO_INR_RATE) : v);
+                calcChartInstance.data.datasets[2].data = bankTraj.map(v => currentCurrency === 'INR' ? Math.round(v * USD_TO_INR_RATE) : v);
                 calcChartInstance.update();
             }
         }
