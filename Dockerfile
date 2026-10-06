@@ -19,5 +19,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY . .
 
-# Launch Apex Sovereign Engine
-CMD ["python", "-m", "src.main"]
+# Launch Apex Sovereign Engine + Web GUI
+CMD ["python", "-m", "src.web.server"]

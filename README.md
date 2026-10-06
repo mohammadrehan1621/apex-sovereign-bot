@@ -1,3 +1,13 @@
+---
+title: Apex Sovereign Bot
+emoji: ⚡
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # 👑 APEX SOVEREIGN ALGORITHMIC TERMINAL (v1.0.0)
 > *The Supreme Algorithmic Market Execution & Defense Protocol.*
 
