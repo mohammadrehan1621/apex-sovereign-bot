@@ -77,11 +77,11 @@ class SovereignTerminalEngine:
         total_equity = cash + unrealized
         self.defense.update_balance(total_equity)
 
-        # 1. Evaluate Defense Layer before touching anything with total equity
-        is_safe = await self.defense.evaluate_safety(total_equity=total_equity)
-        if not is_safe:
+        # 1. Evaluate Defense Layer
+        if self.defense.is_terminated:
             return
 
+        is_safe = await self.defense.evaluate_safety(total_equity=total_equity)
         modifier = self.defense.matrix.get_offensive_risk_modifier()
 
         # Sub-second Multi-Asset Execution Sweep (Indices, Commodities, Forex)
@@ -144,7 +144,7 @@ class SovereignTerminalEngine:
 
                     # 4. Check for New High-Probability 85%+ Sniper Entry
                     else:
-                        if self.config.TRADE_SWING_ALLOCATIONS and confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
+                        if is_safe and self.config.TRADE_SWING_ALLOCATIONS and confluence["signal"] == "BUY" and confluence["probability_score"] >= 85:
                             size = self.risk.calculate_order_size(self.router.paper_balance, current_price, modifier)
                             await self.router.execute_buy(symbol, size, current_price)
                             self.defense.update_balance(self.router.paper_balance)

@@ -125,7 +125,8 @@ async def get_status():
         "whale_flow": engine.latest_whale_feed,
         "confluence_radar": engine.latest_confluence_scores,
         "bot_market_focus": engine.config.BOT_MARKET_FOCUS,
-        "trade_swing_allocations": engine.config.TRADE_SWING_ALLOCATIONS
+        "trade_swing_allocations": engine.config.TRADE_SWING_ALLOCATIONS,
+        "circuit_breaker_active": engine.defense.cooldown_active
     }
 
 @app.get("/api/reports")
@@ -264,6 +265,13 @@ async def close_all_positions():
         "closed_symbols": closed,
         "message": msg
     }
+
+@app.post("/api/defense/reset-cooldown")
+async def reset_cooldown_override():
+    engine.defense.reset_cooldown()
+    msg = "[CIRCUIT BREAKER OVERRIDE] Tactical cooldown cleared by Commander. All trading operations active."
+    recent_logs.append(msg)
+    return {"status": "SUCCESS", "message": msg}
 
 @app.post("/api/trade/custom-order")
 async def submit_custom_order(symbol: str, asset_class: str = "CRYPTO", action: str = "BUY"):

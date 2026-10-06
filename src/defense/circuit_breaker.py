@@ -51,6 +51,15 @@ class DefenseProtocol:
         if layer_breached:
             await self.alerts.emit_alert("99-LAYER REINFORCEMENT ENGAGED", layer_alert, level="CRITICAL")
 
+        # 0. Check active cooldown timer expiration
+        if self.cooldown_active:
+            if hasattr(self, "cooldown_until") and datetime.utcnow() >= self.cooldown_until:
+                self.cooldown_active = False
+                self.consecutive_losses = 0
+                await self.alerts.emit_alert("COOLDOWN COMPLETED", "Tactical cooldown period ended. Normal trading resumed.", level="INFO")
+            else:
+                return False
+
         # 1. Check Absolute Insolvency Floor ("Die if it does not earn / bleeds out")
         if self.config.KILL_ON_INSOLVENCY and self.current_capital <= self.config.INSOLVENCY_FLOOR_USDT:
             self.is_terminated = True
@@ -67,25 +76,36 @@ class DefenseProtocol:
         # 2. Check Daily Drawdown Circuit Breaker
         if daily_loss_pct >= self.config.MAX_DAILY_DRAWDOWN_PCT:
             self.cooldown_active = True
+            from datetime import timedelta
+            self.cooldown_until = datetime.utcnow() + timedelta(minutes=10)
             msg = (
                 f"Daily Drawdown reached {daily_loss_pct * 100:.2f}% "
                 f"(Limit: {self.config.MAX_DAILY_DRAWDOWN_PCT * 100:.2f}%).\n"
-                f"Trading halted for remainder of session to protect capital."
+                f"Trading paused for 10 minutes to protect capital."
             )
             await self.alerts.emit_alert("CIRCUIT BREAKER TRIGGERED", msg, level="CRITICAL")
             return False
 
-        # 3. Check Consecutive Loss Streak
+        # 3. Check Consecutive Loss Streak (60-second tactical cooldown)
         if self.consecutive_losses >= self.config.MAX_CONSECUTIVE_LOSSES:
             self.cooldown_active = True
+            from datetime import timedelta
+            self.cooldown_until = datetime.utcnow() + timedelta(seconds=60)
             msg = (
                 f"Bot incurred {self.consecutive_losses} consecutive loss trades.\n"
-                f"Market conditions unfavorable. Triggering tactical cooldown."
+                f"Market conditions unfavorable. Triggering tactical 60-second cooldown."
             )
             await self.alerts.emit_alert("STREAK DEFENSE ACTIVATED", msg, level="WARNING")
             return False
 
         return True
+
+    def reset_cooldown(self):
+        """Immediately clears cooldown and resets loss streak."""
+        self.cooldown_active = False
+        self.consecutive_losses = 0
+        if hasattr(self, "cooldown_until"):
+            delattr(self, "cooldown_until")
 
     def record_trade_result(self, pnl: float):
         if pnl < 0:
