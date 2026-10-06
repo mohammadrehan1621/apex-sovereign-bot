@@ -9,6 +9,7 @@ from rich.panel import Panel
 from src.config import BotConfig
 from src.telemetry.alerts import TelemetryAlerts
 from src.defense.circuit_breaker import DefenseProtocol
+from src.defense.absolute_security import AbsoluteSecurityDefenseLayer
 from src.risk.risk_engine import RiskEngine
 from src.strategies.supreme_ultra_strategy import SupremeUltraWinStrategy
 from src.strategies.whale_flow import WhaleMomentumTracker
@@ -26,11 +27,13 @@ class SovereignTerminalEngine:
             discord_url=config.DISCORD_WEBHOOK_URL
         )
         self.defense = DefenseProtocol(config, self.alerts)
+        self.security = AbsoluteSecurityDefenseLayer(config, self.alerts)
         self.risk = RiskEngine(config)
         self.strategy = SupremeUltraWinStrategy()
         self.whale_tracker = WhaleMomentumTracker()
-        self.router = ExecutionRouter(config, self.alerts)
+        self.router = ExecutionRouter(config, self.alerts, security=self.security)
         self.hft = MultiAssetMacroHFTMatrix(self.router, self.risk, self.defense, self.alerts)
+        self.hft.security = self.security
         self.iteration = 0
         self.latest_hft_feed: Dict[str, Any] = {}
         self.latest_whale_feed: Dict[str, Any] = {}
@@ -77,7 +80,10 @@ class SovereignTerminalEngine:
         total_equity = cash + unrealized
         self.defense.update_balance(total_equity)
 
-        # 1. Evaluate Defense Layer
+        # 0. Check Absolute Security Lockdown & Defense Layer
+        if self.security.is_locked_down:
+            return
+
         if self.defense.is_terminated:
             return
 

@@ -13,10 +13,12 @@ class ExecutionRouter:
     - LIVE exchange execution via CCXT (Binance, Bybit, Kraken, etc.)
     - 24/366 Persistent SQLite & WAL Ledger Vault
     """
-    def __init__(self, config, alerts):
+    def __init__(self, config, alerts, security=None):
         self.config = config
         self.alerts = alerts
         self.db = CitadelDatabaseVault()
+        from src.defense.absolute_security import AbsoluteSecurityDefenseLayer
+        self.security = security or AbsoluteSecurityDefenseLayer(config, alerts)
         
         # Restore saved balance and synchronize with audited all-time profit
         all_time = self.db.get_all_time_stats()
@@ -89,6 +91,12 @@ class ExecutionRouter:
         return pd.DataFrame(data)
 
     async def execute_buy(self, symbol: str, quantity: float, current_price: float):
+        # Absolute Security Defense Layer Inspection
+        is_safe, reason, details = self.security.inspect_order(symbol, "BUY", quantity, current_price, self.paper_balance)
+        if not is_safe:
+            await self.alerts.emit_alert("ABSOLUTE SECURITY INTERCEPT", reason, level="WARNING")
+            return None
+
         cost = quantity * current_price
         if self.config.MODE == "PAPER":
             if cost > self.paper_balance:

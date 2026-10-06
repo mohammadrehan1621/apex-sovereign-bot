@@ -319,6 +319,38 @@ async def submit_custom_order(symbol: str, asset_class: str = "CRYPTO", action: 
         else:
             return await force_sell(symbol)
 
+# --- ABSOLUTE SECURITY DEFENSE LAYER (ASDL) API ENDPOINTS ---
+@app.get("/api/security/status")
+async def get_security_status():
+    return engine.security.get_security_telemetry()
+
+@app.post("/api/security/lockdown")
+async def trigger_omega_lockdown(flatten_positions: bool = True, reason: str = "Manual Commander Red Button Lockdown"):
+    res = engine.security.trigger_emergency_lockdown("Commander", reason)
+    if flatten_positions:
+        closed = []
+        for sym in list(engine.router.positions.keys()):
+            try:
+                curr_price = engine.router.positions[sym].get("entry_price", 1.0)
+                await engine.router.execute_sell(sym, "OMEGA_LOCKDOWN_FLATTEN", curr_price)
+                closed.append(sym)
+            except Exception:
+                pass
+        res["flattened_positions_count"] = len(closed)
+    recent_logs.append(f"[ABSOLUTE SECURITY] 🚨 Omega Citadel Lockdown ENGAGED. Trading frozen. Cash shielded.")
+    return res
+
+@app.post("/api/security/unlock")
+async def unlock_citadel(passcode: str = "APEX-CITADEL-99"):
+    res = engine.security.unlock_system(passcode, "Commander")
+    if res.get("status") == "SUCCESS":
+        recent_logs.append("[ABSOLUTE SECURITY] ✓ Citadel Lockdown Disengaged. Normal trading restored.")
+    return res
+
+@app.post("/api/security/configure")
+async def configure_security(max_slippage_pct: float = None, max_order_pct: float = None):
+    return engine.security.configure_shields(max_slippage_pct, max_order_pct)
+
 async def run_bot_loop():
     while True:
         try:

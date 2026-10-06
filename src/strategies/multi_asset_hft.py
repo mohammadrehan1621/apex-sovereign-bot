@@ -93,6 +93,9 @@ class MultiAssetMacroHFTMatrix:
         """
         Executes lightning arbitrage fills when imbalance ratio signals high-probability order skew.
         """
+        if hasattr(self, 'security') and self.security and self.security.is_locked_down:
+            return
+
         if target["imbalance_ratio"] >= 1.75:
             # High-conviction liquidity sweep: Capture 0.08% - 0.22% micro-spread delta
             gain_pct = random.uniform(0.0008, 0.0022)
