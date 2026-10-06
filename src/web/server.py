@@ -69,32 +69,43 @@ async def get_chart_data(symbol: str = "BTC/USDT"):
 
 @app.get("/api/status")
 async def get_status():
-    cash = engine.router.paper_balance
+    all_time = engine.router.db.get_all_time_stats()
+    total_hft_profit = all_time.get("total_hft_profit", 0.0)
+    total_swing_profit = all_time.get("total_swing_profit", 0.0)
+    total_realized_profit = total_hft_profit + total_swing_profit
+
+    # Synchronize liquid paper balance: Initial Capital ($10,000) + Total Profit Generated - Active Position Cost
     unrealized = 0.0
     for sym, pos in engine.router.positions.items():
         unrealized += pos["quantity"] * pos["entry_price"]
-    trading_capital = cash + unrealized
+
+    minimum_expected_balance = (config.INITIAL_CAPITAL_USDT + total_realized_profit) - unrealized
+    if engine.router.paper_balance < minimum_expected_balance:
+        engine.router.paper_balance = minimum_expected_balance
+        engine.router.db.set_persisted_state("paper_balance", str(engine.router.paper_balance))
+
+    cash = round(engine.router.paper_balance, 2)
+    # Total Portfolio Equity = Liquid Cash + Market Positions Value = Initial Capital ($10,000) + All Profit Generated
+    total_equity = round(cash + unrealized, 2)
 
     mod = engine.defense.matrix.get_offensive_risk_modifier()
 
     # Calculate cumulative realized alpha & win rate
     trades = engine.router.trade_history
     win_trades = [t for t in trades if t["pnl"] > 0]
-    total_realized_pnl = sum([t["pnl"] for t in trades])
     total_alpha_saved = sum([t.get("alpha_saved_usd", 0) for t in trades])
     win_rate = (len(win_trades) / len(trades) * 100) if len(trades) > 0 else 0.0
 
     # Capital Shield & Alpha Value: Direct Profit + Slippage Saved by Bot
-    shield_and_alpha_value = round(total_realized_pnl + total_alpha_saved + engine.hft.total_hft_profit, 2)
-
-    # Total Portfolio Equity = Trading Capital + Capital Shield & Alpha Value
-    total_equity = round(trading_capital + shield_and_alpha_value, 2)
+    shield_and_alpha_value = round(total_realized_profit + total_alpha_saved, 2)
 
     return {
         "equity": total_equity,
-        "trading_capital": round(trading_capital, 2),
+        "initial_capital": config.INITIAL_CAPITAL_USDT,
+        "total_realized_profit": round(total_realized_profit, 2),
+        "trading_capital": total_equity,
         "shield_and_alpha_value": shield_and_alpha_value,
-        "cash": round(cash, 2),
+        "cash": cash,
         "unrealized": round(unrealized, 2),
         "active_tier": mod["current_tier"],
         "tier_name": mod["tier_name"],
@@ -104,7 +115,7 @@ async def get_status():
         "trades_count": len(trades),
         "trade_history": trades[-20:],
         "win_rate": round(win_rate, 1),
-        "total_realized_pnl": round(total_realized_pnl, 2),
+        "total_realized_pnl": round(total_realized_profit, 2),
         "total_alpha_saved": round(total_alpha_saved, 2),
         "recent_logs": recent_logs[-15:],
         "hft_gaps": engine.latest_hft_feed,

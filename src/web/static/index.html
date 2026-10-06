@@ -662,18 +662,18 @@
             <div class="kpi-val" id="total-equity">$10,000.00</div>
             <div class="kpi-sub" style="font-size: 0.72rem; line-height: 1.4;">
                 <span style="color: var(--accent-emerald);" id="net-roi">+0.00% Net ROI</span>
-                <span style="color: var(--text-muted);">| Capital:</span>
-                <span id="trading-capital-display" style="color: #fff;">$10,000.00</span>
-                <span style="color: var(--text-muted);">| Alpha:</span>
-                <span id="alpha-shield-sub" style="color: var(--accent-emerald);">+$0.00</span>
+                <span style="color: var(--text-muted);">| Cash:</span>
+                <span id="liquid-cash" style="color: #fff;">$10,000.00</span>
+                <span style="color: var(--text-muted);">| Orig. Base:</span>
+                <span style="color: #94a3b8;">$10,000.00</span>
             </div>
         </div>
 
         <div class="glass-panel kpi-card">
             <div class="kpi-label">Capital Shield & Alpha Value</div>
             <div class="kpi-val" style="color: var(--accent-emerald);" id="value-generated">+$0.00</div>
-            <div class="kpi-sub">
-                <span>Direct Profit + Slippage Saved by Bot</span>
+            <div class="kpi-sub" style="font-size: 0.72rem; line-height: 1.4;">
+                <span id="profit-breakdown">Direct Profit + Slippage Saved by Bot</span>
             </div>
         </div>
 
@@ -1173,12 +1173,8 @@
 
                 // Core Equity KPIs
                 document.getElementById('total-equity').textContent = `$${data.equity.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-                if (document.getElementById('trading-capital-display')) {
-                    document.getElementById('trading-capital-display').textContent = `$${(data.trading_capital || data.cash).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-                }
-                if (document.getElementById('alpha-shield-sub')) {
-                    const shieldVal = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : (data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit);
-                    document.getElementById('alpha-shield-sub').textContent = `+$${shieldVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                if (document.getElementById('liquid-cash')) {
+                    document.getElementById('liquid-cash').textContent = `$${data.cash.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
                 }
                 
                 const roi = ((data.equity - 10000.0) / 10000.0) * 100;
@@ -1223,8 +1219,12 @@
 
                 // Proof of Value Metrics (Capital Shield & Alpha Value card)
                 document.getElementById('slippage-stat').textContent = `+$${data.total_alpha_saved.toFixed(2)}`;
-                const totalAlphaShield = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : (data.total_realized_pnl + data.total_alpha_saved + data.total_hft_profit);
+                const totalAlphaShield = (data.shield_and_alpha_value !== undefined) ? data.shield_and_alpha_value : ((data.total_realized_profit || 0) + data.total_alpha_saved);
                 document.getElementById('value-generated').textContent = `${totalAlphaShield >= 0 ? '+' : ''}$${totalAlphaShield.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+                if (document.getElementById('profit-breakdown')) {
+                    const profitVal = (data.total_realized_profit !== undefined) ? data.total_realized_profit : (data.total_hft_profit || 0);
+                    document.getElementById('profit-breakdown').textContent = `+$${profitVal.toLocaleString('en-US', {minimumFractionDigits: 2})} Realized Profit + $${data.total_alpha_saved.toFixed(2)} Slippage Shield`;
+                }
 
                 // Sync Automated Swing Allocations State
                 if (data.trade_swing_allocations !== undefined) {

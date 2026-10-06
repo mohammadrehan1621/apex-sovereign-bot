@@ -18,9 +18,18 @@ class ExecutionRouter:
         self.alerts = alerts
         self.db = CitadelDatabaseVault()
         
-        # Restore saved balance if available
+        # Restore saved balance and synchronize with audited all-time profit
+        all_time = self.db.get_all_time_stats()
+        hft_profit = all_time.get("total_hft_profit", 0.0)
+        swing_profit = all_time.get("total_swing_profit", 0.0)
+        ledger_balance = config.INITIAL_CAPITAL_USDT + hft_profit + swing_profit
+
         saved_balance = self.db.get_persisted_state("paper_balance")
-        self.paper_balance = float(saved_balance) if saved_balance else config.INITIAL_CAPITAL_USDT
+        if saved_balance and float(saved_balance) > ledger_balance:
+            self.paper_balance = float(saved_balance)
+        else:
+            self.paper_balance = ledger_balance
+            self.db.set_persisted_state("paper_balance", str(self.paper_balance))
         self.positions: Dict[str, Dict[str, Any]] = {}
         self.trade_history: List[Dict[str, Any]] = self.db.get_recent_trades(limit=50)
         
