@@ -103,12 +103,67 @@ async def get_status():
         "total_hft_captures": engine.hft.total_gap_captures,
         "hft_trades_history": engine.hft.index_trades_history[-20:],
         "whale_flow": engine.latest_whale_feed,
-        "confluence_radar": engine.latest_confluence_scores
+        "confluence_radar": engine.latest_confluence_scores,
+        "bot_market_focus": engine.config.BOT_MARKET_FOCUS
     }
 
 @app.get("/api/reports")
 async def get_performance_reports():
     return engine.router.db.get_pnl_reports()
+
+@app.get("/api/bot/focus")
+async def get_bot_focus():
+    return {
+        "focus": engine.config.BOT_MARKET_FOCUS,
+        "crypto": engine.config.TRADE_CRYPTO,
+        "indices": engine.config.TRADE_INDICES,
+        "commodities": engine.config.TRADE_COMMODITIES,
+        "forex": engine.config.TRADE_FOREX
+    }
+
+@app.post("/api/bot/focus")
+async def set_bot_focus(mode: str):
+    mode_upper = mode.upper()
+    engine.config.BOT_MARKET_FOCUS = mode_upper
+    
+    if mode_upper == "CRYPTO_ONLY":
+        engine.config.TRADE_CRYPTO = True
+        engine.config.TRADE_INDICES = False
+        engine.config.TRADE_COMMODITIES = False
+        engine.config.TRADE_FOREX = False
+        title = "🪙 ONLY CRYPTO"
+    elif mode_upper == "COMMODITIES_ONLY":
+        engine.config.TRADE_CRYPTO = False
+        engine.config.TRADE_INDICES = False
+        engine.config.TRADE_COMMODITIES = True
+        engine.config.TRADE_FOREX = False
+        title = "🥇 ONLY COMMODITIES (GOLD & OIL)"
+    elif mode_upper == "INDICES_ONLY":
+        engine.config.TRADE_CRYPTO = False
+        engine.config.TRADE_INDICES = True
+        engine.config.TRADE_COMMODITIES = False
+        engine.config.TRADE_FOREX = False
+        title = "🌐 ONLY GLOBAL INDICES (S&P 500, NASDAQ, DOW)"
+    elif mode_upper == "FOREX_ONLY":
+        engine.config.TRADE_CRYPTO = False
+        engine.config.TRADE_INDICES = False
+        engine.config.TRADE_COMMODITIES = False
+        engine.config.TRADE_FOREX = True
+        title = "💱 ONLY FOREX (EUR/USD, GBP/USD)"
+    else:  # ALL
+        engine.config.BOT_MARKET_FOCUS = "ALL"
+        engine.config.TRADE_CRYPTO = True
+        engine.config.TRADE_INDICES = True
+        engine.config.TRADE_COMMODITIES = True
+        engine.config.TRADE_FOREX = True
+        title = "🌐 ALL MARKETS (OMNI-ASSET ARBITRAGE)"
+
+    recent_logs.append(f"[BOT RE-ROUTED] Trading Focus set to: {title} by Commander.")
+    return {
+        "status": "SUCCESS",
+        "focus": engine.config.BOT_MARKET_FOCUS,
+        "title": title
+    }
 
 @app.post("/api/trade/force-buy")
 async def force_buy(symbol: str = "BTC/USDT"):

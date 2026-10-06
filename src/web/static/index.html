@@ -501,6 +501,59 @@
             color: var(--accent-rose);
             opacity: 0.75;
         }
+
+        /* 1-Click Bot Market Focus Regime Selector */
+        .focus-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .focus-mode-card {
+            background: rgba(13, 18, 30, 0.75);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-align: left;
+        }
+
+        .focus-mode-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+            background: rgba(18, 25, 42, 0.9);
+        }
+
+        .focus-mode-card.active {
+            border-color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.12);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .focus-card-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .focus-mode-card.active .focus-card-badge {
+            background: rgba(16, 185, 129, 0.25);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .focus-mode-card:not(.active) .focus-card-badge {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
     </style>
 </head>
 <body>
@@ -534,30 +587,70 @@
 
     <!-- VIEW 1: LIVE TRADING TERMINAL -->
     <div id="view-live-terminal">
-    <!-- Multi-Asset Tactical Master Switchboard -->
-    <div class="glass-panel" style="margin-bottom: 24px; padding: 18px 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+    <!-- 1-Click Bot Market Focus Regime Switchboard -->
+    <div class="glass-panel" style="margin-bottom: 24px; padding: 22px 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
             <div>
-                <div style="font-family: 'Space Grotesk'; font-size: 1.05rem; font-weight: 700; color: #fff;">
-                    🎛️ Active Multi-Asset Execution Switchboard
+                <div style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
+                    <span>🎯 BOT OPERATING MARKET REGIME</span>
+                    <span class="brand-badge" id="current-focus-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.4);">FOCUS: ALL MARKETS</span>
                 </div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">
-                    Choose exactly which markets the bot trades. Click any toggle to enable or disable in real time.
+                <div style="font-size: 0.8rem; color: var(--text-body); margin-top: 2px;">
+                    Select where the algorithmic engine focuses its capital. Click any option below to switch the entire bot instantly:
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="market-toggle-btn active" id="toggle-crypto" onclick="toggleMarket('CRYPTO')">
-                    🪙 CRYPTO: <span id="status-crypto" style="font-weight: 700;">ACTIVE</span>
-                </button>
-                <button class="market-toggle-btn active" id="toggle-indices" onclick="toggleMarket('INDICES')">
-                    🌐 INDICES: <span id="status-indices" style="font-weight: 700;">ACTIVE</span>
-                </button>
-                <button class="market-toggle-btn active" id="toggle-commodities" onclick="toggleMarket('COMMODITIES')">
-                    🥇 COMMODITIES: <span id="status-commodities" style="font-weight: 700;">ACTIVE</span>
-                </button>
-                <button class="market-toggle-btn active" id="toggle-forex" onclick="toggleMarket('FOREX')">
-                    💱 FOREX: <span id="status-forex" style="font-weight: 700;">ACTIVE</span>
-                </button>
+            <div id="focus-change-alert" style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--accent-emerald); display: none;"></div>
+        </div>
+
+        <div class="focus-cards-grid">
+            <!-- Mode 1: ALL -->
+            <div class="focus-mode-card active" id="card-focus-all" onclick="selectBotFocus('ALL')">
+                <div style="font-size: 1.4rem; margin-bottom: 6px;">🌐</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">ALL MARKETS</div>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    Omni-Asset Arbitrage across Crypto, Indices, Commodities & Forex.
+                </div>
+                <div class="focus-card-badge" id="badge-focus-all">● ACTIVE</div>
+            </div>
+
+            <!-- Mode 2: CRYPTO ONLY -->
+            <div class="focus-mode-card" id="card-focus-crypto_only" onclick="selectBotFocus('CRYPTO_ONLY')">
+                <div style="font-size: 1.4rem; margin-bottom: 6px;">🪙</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">ONLY CRYPTO</div>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    100% Capital allocated to Bitcoin, Ethereum, Solana & Altcoins.
+                </div>
+                <div class="focus-card-badge" id="badge-focus-crypto_only">SELECT</div>
+            </div>
+
+            <!-- Mode 3: COMMODITIES ONLY -->
+            <div class="focus-mode-card" id="card-focus-commodities_only" onclick="selectBotFocus('COMMODITIES_ONLY')">
+                <div style="font-size: 1.4rem; margin-bottom: 6px;">🥇</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">ONLY COMMODITIES</div>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    Gold (Spot XAU), Silver, and Crude Oil (WTI) high-volatility trading.
+                </div>
+                <div class="focus-card-badge" id="badge-focus-commodities_only">SELECT</div>
+            </div>
+
+            <!-- Mode 4: INDICES ONLY -->
+            <div class="focus-mode-card" id="card-focus-indices_only" onclick="selectBotFocus('INDICES_ONLY')">
+                <div style="font-size: 1.4rem; margin-bottom: 6px;">📈</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">ONLY INDICES</div>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    S&P 500, Nasdaq 100, Dow Jones, and Nikkei 225 equity futures.
+                </div>
+                <div class="focus-card-badge" id="badge-focus-indices_only">SELECT</div>
+            </div>
+
+            <!-- Mode 5: FOREX ONLY -->
+            <div class="focus-mode-card" id="card-focus-forex_only" onclick="selectBotFocus('FOREX_ONLY')">
+                <div style="font-size: 1.4rem; margin-bottom: 6px;">💱</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">ONLY FOREX</div>
+                <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    Major institutional currency pairs: EUR/USD, GBP/USD, USD/JPY.
+                </div>
+                <div class="focus-card-badge" id="badge-focus-forex_only">SELECT</div>
             </div>
         </div>
     </div>
@@ -1179,6 +1272,11 @@
                     });
                     logBox.scrollTop = logBox.scrollHeight;
                 }
+
+                // Sync Bot Market Focus Regime
+                if (data.bot_market_focus) {
+                    syncBotFocusUI(data.bot_market_focus);
+                }
             } catch (err) {
                 console.error("Citadel status sync error:", err);
             }
@@ -1450,6 +1548,102 @@
                 opt.textContent = item.label;
                 symbolSelect.appendChild(opt);
             });
+        }
+
+        // 1-Click Bot Market Focus Switching Logic
+        let activeMarketFocus = 'ALL';
+
+        function syncBotFocusUI(focusMode) {
+            if (!focusMode) return;
+            activeMarketFocus = focusMode.toUpperCase();
+            const modes = ['ALL', 'CRYPTO_ONLY', 'COMMODITIES_ONLY', 'INDICES_ONLY', 'FOREX_ONLY'];
+            modes.forEach(m => {
+                const card = document.getElementById(`card-focus-${m.toLowerCase()}`);
+                const badge = document.getElementById(`badge-focus-${m.toLowerCase()}`);
+                if (card && badge) {
+                    if (m === activeMarketFocus) {
+                        card.classList.add('active');
+                        badge.textContent = '● ACTIVE';
+                    } else {
+                        card.classList.remove('active');
+                        badge.textContent = 'SELECT';
+                    }
+                }
+            });
+
+            const headerBadge = document.getElementById('current-focus-badge');
+            if (headerBadge) {
+                const displayNames = {
+                    'ALL': 'FOCUS: ALL MARKETS',
+                    'CRYPTO_ONLY': 'FOCUS: ONLY CRYPTO',
+                    'COMMODITIES_ONLY': 'FOCUS: ONLY COMMODITIES',
+                    'INDICES_ONLY': 'FOCUS: ONLY INDICES',
+                    'FOREX_ONLY': 'FOCUS: ONLY FOREX'
+                };
+                headerBadge.textContent = displayNames[activeMarketFocus] || `FOCUS: ${activeMarketFocus}`;
+            }
+        }
+
+        async function selectBotFocus(mode) {
+            const alertBox = document.getElementById('focus-change-alert');
+            if (alertBox) {
+                alertBox.style.display = 'block';
+                alertBox.style.color = 'var(--accent-primary)';
+                alertBox.textContent = `⚡ Switching bot regime to ${mode}...`;
+            }
+
+            try {
+                const res = await fetch(`/api/bot/focus?mode=${encodeURIComponent(mode)}`, {
+                    method: 'POST'
+                });
+                const result = await res.json();
+                syncBotFocusUI(result.focus || mode);
+
+                if (alertBox) {
+                    alertBox.style.color = 'var(--accent-emerald)';
+                    alertBox.textContent = `✓ Bot re-routed: ${result.title || mode}`;
+                    setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+                }
+
+                // Automatically align live chart & order ticket to primary asset of chosen focus
+                if (mode === 'CRYPTO_ONLY') {
+                    switchSymbol('BTC/USDT');
+                    const assetSelect = document.getElementById('manual-asset-class');
+                    if (assetSelect) {
+                        assetSelect.value = 'CRYPTO';
+                        onAssetClassChange();
+                    }
+                } else if (mode === 'COMMODITIES_ONLY') {
+                    switchSymbol('GC=F');
+                    const assetSelect = document.getElementById('manual-asset-class');
+                    if (assetSelect) {
+                        assetSelect.value = 'COMMODITIES';
+                        onAssetClassChange();
+                    }
+                } else if (mode === 'INDICES_ONLY') {
+                    switchSymbol('^GSPC');
+                    const assetSelect = document.getElementById('manual-asset-class');
+                    if (assetSelect) {
+                        assetSelect.value = 'INDICES';
+                        onAssetClassChange();
+                    }
+                } else if (mode === 'FOREX_ONLY') {
+                    switchSymbol('EURUSD=X');
+                    const assetSelect = document.getElementById('manual-asset-class');
+                    if (assetSelect) {
+                        assetSelect.value = 'FOREX';
+                        onAssetClassChange();
+                    }
+                }
+
+                fetchMarketToggles();
+            } catch (err) {
+                console.error("Failed to set bot focus:", err);
+                if (alertBox) {
+                    alertBox.style.color = 'var(--accent-rose)';
+                    alertBox.textContent = `✕ Focus change error: ${err.message}`;
+                }
+            }
         }
 
         let currentMarketStates = {

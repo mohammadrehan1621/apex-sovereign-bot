@@ -21,6 +21,7 @@ class BotConfig(BaseModel):
     TIMEFRAME: str = Field(default="1m")
 
     # Multi-Asset Market Class Toggles
+    BOT_MARKET_FOCUS: str = Field(default="ALL", description="ALL, CRYPTO_ONLY, COMMODITIES_ONLY, INDICES_ONLY, FOREX_ONLY")
     TRADE_CRYPTO: bool = Field(default=True, description="Enable Crypto trading (BTC, ETH, SOL)")
     TRADE_INDICES: bool = Field(default=True, description="Enable Global Indices trading (S&P 500, Nasdaq, Dow, Nikkei)")
     TRADE_COMMODITIES: bool = Field(default=True, description="Enable Commodities trading (Gold, Silver, Crude Oil)")
