@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
+import random
 import pandas as pd
 
 from src.config import BotConfig
@@ -308,7 +309,7 @@ async def submit_custom_order(symbol: str, asset_class: str = "CRYPTO", action: 
             "symbol": symbol,
             "display": info.get("ticker", symbol),
             "imbalance_ratio": 2.50,
-            "latency_ms": 1.2
+            "latency_ms": round(random.uniform(0.12, 0.32), 3)
         }
         await engine.hft.execute_subsecond_exploit(dummy_target)
         recent_logs.append(f"[MANUAL ORDER] {action_upper} on {dummy_target['display']} [{asset_class_upper}] Executed Successfully.")

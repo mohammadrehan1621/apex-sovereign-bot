@@ -269,7 +269,7 @@ class CitadelDatabaseVault:
                     "worst_trade": round(swings["worst_trade"], 2),
                     "total_volume": round(swings["total_volume"], 2),
                     "alpha_saved": round(swings["alpha_saved"], 2),
-                    "avg_latency_ms": round(hft["avg_latency"], 1),
+                    "avg_latency_ms": round(hft["avg_latency"], 2),
                     "timeline": timeline
                 }
 
