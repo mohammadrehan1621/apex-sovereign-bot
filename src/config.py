@@ -19,6 +19,12 @@ class BotConfig(BaseModel):
     INITIAL_CAPITAL_USDT: float = Field(default=10000.0, description="Virtual starting balance for paper trading")
     PAIRS: List[str] = Field(default=["BTC/USDT", "ETH/USDT", "SOL/USDT"])
     TIMEFRAME: str = Field(default="1m")
+
+    # Multi-Asset Market Class Toggles
+    TRADE_CRYPTO: bool = Field(default=True, description="Enable Crypto trading (BTC, ETH, SOL)")
+    TRADE_INDICES: bool = Field(default=True, description="Enable Global Indices trading (S&P 500, Nasdaq, Dow, Nikkei)")
+    TRADE_COMMODITIES: bool = Field(default=True, description="Enable Commodities trading (Gold, Silver, Crude Oil)")
+    TRADE_FOREX: bool = Field(default=True, description="Enable Forex trading (EUR/USD, GBP/USD, USD/JPY)")
     
     # Supreme Execution & Risk
     MAX_POSITION_SIZE_PCT: float = Field(default=0.15, description="Max 15% capital per single position")

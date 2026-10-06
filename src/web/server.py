@@ -122,17 +122,55 @@ async def force_buy(symbol: str = "BTC/USDT"):
         return {"status": "SUCCESS", "message": f"Bought {size:.4f} of {symbol} at ${current_price:,.2f}"}
     return {"status": "FAILED", "message": "Insufficient cash balance"}
 
-@app.post("/api/trade/force-sell")
-async def force_sell(symbol: str = "BTC/USDT"):
-    if symbol in engine.router.positions:
-        df = await engine.router.fetch_ohlcv(symbol, timeframe="1m", limit=10)
-        current_price = float(df["close"].iloc[-1])
-        res = await engine.router.execute_sell(symbol, "MANUAL_COMMAND", current_price)
-        if res:
-            engine.defense.record_trade_result(res["pnl"])
-            engine.defense.update_balance(engine.router.paper_balance)
-            return {"status": "SUCCESS", "message": f"Sold {symbol} at ${current_price:,.2f} with PnL ${res['pnl']:+,.2f}"}
-    return {"status": "FAILED", "message": f"No open position found for {symbol}"}
+@app.get("/api/markets/toggles")
+async def get_market_toggles():
+    return {
+        "CRYPTO": engine.config.TRADE_CRYPTO,
+        "INDICES": engine.config.TRADE_INDICES,
+        "COMMODITIES": engine.config.TRADE_COMMODITIES,
+        "FOREX": engine.config.TRADE_FOREX
+    }
+
+@app.post("/api/markets/toggle")
+async def toggle_market(market: str, enabled: bool):
+    market_upper = market.upper()
+    if market_upper == "CRYPTO":
+        engine.config.TRADE_CRYPTO = enabled
+    elif market_upper == "INDICES":
+        engine.config.TRADE_INDICES = enabled
+    elif market_upper == "COMMODITIES":
+        engine.config.TRADE_COMMODITIES = enabled
+    elif market_upper == "FOREX":
+        engine.config.TRADE_FOREX = enabled
+    else:
+        return {"status": "ERROR", "message": f"Unknown market: {market}"}
+    
+    status_str = "ENABLED" if enabled else "DISABLED"
+    recent_logs.append(f"[MARKET CONFIG] {market_upper} Trading {status_str} by Commander.")
+    return {"status": "SUCCESS", "market": market_upper, "enabled": enabled}
+
+@app.post("/api/trade/custom-order")
+async def submit_custom_order(symbol: str, asset_class: str = "CRYPTO", action: str = "BUY"):
+    action_upper = action.upper()
+    asset_class_upper = asset_class.upper()
+    
+    if asset_class_upper in ["INDICES", "COMMODITIES", "FOREX"]:
+        info = engine.hft.INDICES_CATALOG.get(symbol) or {"ticker": symbol, "base_price": 100.0, "tick_size": 1.0}
+        dummy_target = {
+            "asset_class": asset_class_upper,
+            "symbol": symbol,
+            "display": info.get("ticker", symbol),
+            "imbalance_ratio": 2.50,
+            "latency_ms": 1.2
+        }
+        await engine.hft.execute_subsecond_exploit(dummy_target)
+        recent_logs.append(f"[MANUAL ORDER] {action_upper} on {dummy_target['display']} [{asset_class_upper}] Executed Successfully.")
+        return {"status": "SUCCESS", "message": f"{action_upper} executed on {dummy_target['display']} [{asset_class_upper}]"}
+    else:
+        if action_upper == "BUY":
+            return await force_buy(symbol)
+        else:
+            return await force_sell(symbol)
 
 async def run_bot_loop():
     while True:

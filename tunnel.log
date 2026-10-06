@@ -136,3 +136,4 @@
 {"level":"info","run_id":"24218ffd-2fc9-4fac-8ff3-0129f9291553","hard_fail":false,"suggested_protocol":"quic","time":"2026-10-06T08:58:00Z","message":"precheck complete"}
 {"level":"info","event":0,"connection":"d70dd564-1f27-4e16-846a-4361c0f2eae7","connIndex":0,"location":"del03","ip":"198.41.200.63","protocol":"quic","time":"2026-10-06T08:58:01Z","message":"Registered tunnel connection"}
 {"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-10-06T08:58:05Z","message":"Failed to initialize DNS local resolver"}
+{"level":"error","error":"lookup region1.v2.argotunnel.com: i/o timeout","time":"2026-10-06T08:58:08Z","message":"Failed to refresh DNS local resolver"}

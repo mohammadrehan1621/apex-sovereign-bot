@@ -470,6 +470,37 @@
             border-color: rgba(56, 189, 248, 0.3);
             transform: translateY(-2px);
         }
+
+        /* Market Class Execution Toggles */
+        .market-toggle-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .market-toggle-btn.active {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: var(--accent-emerald);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.2);
+        }
+
+        .market-toggle-btn.disabled {
+            background: rgba(244, 63, 94, 0.08);
+            border-color: rgba(244, 63, 94, 0.3);
+            color: var(--accent-rose);
+            opacity: 0.75;
+        }
     </style>
 </head>
 <body>
@@ -503,6 +534,34 @@
 
     <!-- VIEW 1: LIVE TRADING TERMINAL -->
     <div id="view-live-terminal">
+    <!-- Multi-Asset Tactical Master Switchboard -->
+    <div class="glass-panel" style="margin-bottom: 24px; padding: 18px 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div>
+                <div style="font-family: 'Space Grotesk'; font-size: 1.05rem; font-weight: 700; color: #fff;">
+                    🎛️ Active Multi-Asset Execution Switchboard
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">
+                    Choose exactly which markets the bot trades. Click any toggle to enable or disable in real time.
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="market-toggle-btn active" id="toggle-crypto" onclick="toggleMarket('CRYPTO')">
+                    🪙 CRYPTO: <span id="status-crypto" style="font-weight: 700;">ACTIVE</span>
+                </button>
+                <button class="market-toggle-btn active" id="toggle-indices" onclick="toggleMarket('INDICES')">
+                    🌐 INDICES: <span id="status-indices" style="font-weight: 700;">ACTIVE</span>
+                </button>
+                <button class="market-toggle-btn active" id="toggle-commodities" onclick="toggleMarket('COMMODITIES')">
+                    🥇 COMMODITIES: <span id="status-commodities" style="font-weight: 700;">ACTIVE</span>
+                </button>
+                <button class="market-toggle-btn active" id="toggle-forex" onclick="toggleMarket('FOREX')">
+                    💱 FOREX: <span id="status-forex" style="font-weight: 700;">ACTIVE</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Top Key Metrics KPI Grid -->
     <div class="kpi-grid">
         <div class="glass-panel kpi-card">
@@ -622,13 +681,35 @@
                 </div>
             </div>
 
-            <!-- Tactical Manual Commands -->
+            <!-- Tactical Multi-Asset Order Execution Ticket -->
             <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px;">Tactical Override Test:</div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-action btn-buy" onclick="triggerManualTrade('buy')">+ TEST AUTO BUY</button>
-                    <button class="btn-action btn-sell" onclick="triggerManualTrade('sell')">- CLOSE POSITION</button>
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-weight: 700; letter-spacing: 1px;">
+                    🎯 Custom Multi-Asset Order Ticket:
                 </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Market:</label>
+                        <select id="manual-asset-class" onchange="onAssetClassChange()" style="width: 100%; background: rgba(13, 18, 30, 0.9); border: 1px solid var(--border-subtle); color: #fff; padding: 7px 10px; border-radius: 8px; font-family: 'Space Grotesk'; font-size: 0.8rem; cursor: pointer;">
+                            <option value="CRYPTO">🪙 Cryptocurrency</option>
+                            <option value="INDICES">🌐 Global Indices</option>
+                            <option value="COMMODITIES">🥇 Commodities</option>
+                            <option value="FOREX">💱 Forex</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Instrument:</label>
+                        <select id="manual-symbol" style="width: 100%; background: rgba(13, 18, 30, 0.9); border: 1px solid var(--border-subtle); color: #fff; padding: 7px 10px; border-radius: 8px; font-family: 'Space Grotesk'; font-size: 0.8rem; cursor: pointer;">
+                            <option value="BTC/USDT">Bitcoin (BTC/USDT)</option>
+                            <option value="ETH/USDT">Ethereum (ETH/USDT)</option>
+                            <option value="SOL/USDT">Solana (SOL/USDT)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action btn-buy" style="flex: 1;" onclick="executeCustomOrder('BUY')">🟢 BUY / LONG</button>
+                    <button class="btn-action btn-sell" style="flex: 1;" onclick="executeCustomOrder('SELL')">🔴 SELL / SHORT</button>
+                </div>
+                <div id="manual-order-msg" style="font-size: 0.75rem; margin-top: 8px; font-family: 'JetBrains Mono'; text-align: center; display: none;"></div>
             </div>
         </div>
     </div>
@@ -1329,7 +1410,128 @@
             document.body.removeChild(link);
         }
 
+        // Market Toggles & Custom Order Logic
+        const INSTRUMENT_MAP = {
+            "CRYPTO": [
+                { id: "BTC/USDT", label: "Bitcoin (BTC/USDT)" },
+                { id: "ETH/USDT", label: "Ethereum (ETH/USDT)" },
+                { id: "SOL/USDT", label: "Solana (SOL/USDT)" },
+                { id: "BNB/USDT", label: "Binance Coin (BNB/USDT)" },
+                { id: "XRP/USDT", label: "Ripple (XRP/USDT)" },
+                { id: "DOGE/USDT", label: "Dogecoin (DOGE/USDT)" }
+            ],
+            "INDICES": [
+                { id: "^GSPC", label: "S&P 500 Index (SPX)" },
+                { id: "^IXIC", label: "Nasdaq 100 Index (NDX)" },
+                { id: "^DJI", label: "Dow Jones Industrial (DJI)" },
+                { id: "^N225", label: "Nikkei 225 Index (NIKKEI)" }
+            ],
+            "COMMODITIES": [
+                { id: "GC=F", label: "Gold Spot (XAU/USD)" },
+                { id: "SI=F", label: "Silver Spot (XAG/USD)" },
+                { id: "CL=F", label: "Crude Oil (WTI)" }
+            ],
+            "FOREX": [
+                { id: "EURUSD=X", label: "EUR / USD (Euro)" },
+                { id: "GBPUSD=X", label: "GBP / USD (British Pound)" },
+                { id: "USDJPY=X", label: "USD / JPY (Japanese Yen)" }
+            ]
+        };
+
+        function onAssetClassChange() {
+            const assetClass = document.getElementById('manual-asset-class').value;
+            const symbolSelect = document.getElementById('manual-symbol');
+            symbolSelect.innerHTML = '';
+            
+            const list = INSTRUMENT_MAP[assetClass] || [];
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.label;
+                symbolSelect.appendChild(opt);
+            });
+        }
+
+        let currentMarketStates = {
+            CRYPTO: true,
+            INDICES: true,
+            COMMODITIES: true,
+            FOREX: true
+        };
+
+        async function fetchMarketToggles() {
+            try {
+                const res = await fetch('/api/markets/toggles');
+                const data = await res.json();
+                currentMarketStates = data;
+                updateToggleUI('CRYPTO', data.CRYPTO);
+                updateToggleUI('INDICES', data.INDICES);
+                updateToggleUI('COMMODITIES', data.COMMODITIES);
+                updateToggleUI('FOREX', data.FOREX);
+            } catch (e) {
+                console.error("Failed to fetch market toggles:", e);
+            }
+        }
+
+        function updateToggleUI(market, isActive) {
+            const btn = document.getElementById(`toggle-${market.toLowerCase()}`);
+            const statusSpan = document.getElementById(`status-${market.toLowerCase()}`);
+            if (!btn || !statusSpan) return;
+
+            if (isActive) {
+                btn.className = 'market-toggle-btn active';
+                statusSpan.textContent = 'ACTIVE';
+                statusSpan.style.color = 'var(--accent-emerald)';
+            } else {
+                btn.className = 'market-toggle-btn disabled';
+                statusSpan.textContent = 'PAUSED';
+                statusSpan.style.color = 'var(--accent-rose)';
+            }
+        }
+
+        async function toggleMarket(market) {
+            const newState = !currentMarketStates[market];
+            currentMarketStates[market] = newState;
+            updateToggleUI(market, newState);
+
+            try {
+                await fetch(`/api/markets/toggle?market=${encodeURIComponent(market)}&enabled=${newState}`, {
+                    method: 'POST'
+                });
+            } catch (err) {
+                console.error("Failed to toggle market:", err);
+            }
+        }
+
+        async function executeCustomOrder(side) {
+            const assetClass = document.getElementById('manual-asset-class').value;
+            const symbol = document.getElementById('manual-symbol').value;
+            const msgBox = document.getElementById('manual-order-msg');
+            msgBox.style.display = 'block';
+            msgBox.style.color = 'var(--accent-primary)';
+            msgBox.textContent = `Routing ${side} order for ${symbol} [${assetClass}]...`;
+
+            try {
+                const res = await fetch(`/api/trade/custom-order?symbol=${encodeURIComponent(symbol)}&asset_class=${encodeURIComponent(assetClass)}&action=${encodeURIComponent(side)}`, {
+                    method: 'POST'
+                });
+                const result = await res.json();
+                if (result.status === 'SUCCESS') {
+                    msgBox.style.color = 'var(--accent-emerald)';
+                    msgBox.textContent = `✓ ${result.message}`;
+                } else {
+                    msgBox.style.color = 'var(--accent-rose)';
+                    msgBox.textContent = `✕ ${result.message || 'Execution rejected'}`;
+                }
+                setTimeout(() => { msgBox.style.display = 'none'; }, 5000);
+            } catch (err) {
+                msgBox.style.color = 'var(--accent-rose)';
+                msgBox.textContent = `✕ Connection error: ${err.message}`;
+            }
+        }
+
         initChart();
+        fetchMarketToggles();
         setInterval(updateChart, 2500);
         setInterval(fetchCitadelStatus, 2000);
         setInterval(fetchWorldMarkets, 4000);
