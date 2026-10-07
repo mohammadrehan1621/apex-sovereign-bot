@@ -1492,6 +1492,18 @@
                 🟡 Binance Setup
             </button>
 
+            <!-- Auto-Updating Real-Time Global Market Clock -->
+            <div class="mode-badge-pill" id="header-live-clock-pill" title="Live Auto-Syncing Trading Clock (Local Time & Global UTC Market Time)">
+                <span style="display: inline-flex; align-items: center; gap: 5px; color: var(--accent-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">
+                    <span>🕒</span>
+                    <span id="live-clock-local">--:--:--</span>
+                </span>
+                <span style="color: rgba(255, 255, 255, 0.2);">|</span>
+                <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.70rem;">
+                    <span id="live-clock-utc">--:--:-- UTC</span>
+                </span>
+            </div>
+
             <div class="mode-badge-pill" title="Live real-time market feeds connected to Binance & Yahoo Finance. Orders executed on Paper Testnet simulation to protect capital while verifying alpha.">
                 <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent-emerald); font-weight: 700;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald);"></span>
@@ -5149,6 +5161,25 @@ EXCHANGE_API_SECRET="your_binance_api_secret_here"</pre>
                 msgBox.textContent = `✕ Connection error: ${err.message}`;
             }
         }
+
+        // Auto-Updating Real-Time Live Clock System
+        function updateLiveClockSystem() {
+            const now = new Date();
+            const localEl = document.getElementById('live-clock-local');
+            const utcEl = document.getElementById('live-clock-utc');
+            if (localEl) {
+                const timeStr = now.toLocaleTimeString('en-IN', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                localEl.textContent = `${timeStr} IST`;
+            }
+            if (utcEl) {
+                const hours = String(now.getUTCHours()).padStart(2, '0');
+                const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(now.getUTCSeconds()).padStart(2, '0');
+                utcEl.textContent = `${hours}:${minutes}:${seconds} UTC`;
+            }
+        }
+        setInterval(updateLiveClockSystem, 1000);
+        updateLiveClockSystem();
 
         initChart();
         initTradingView(selectedSymbol);
