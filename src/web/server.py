@@ -141,6 +141,14 @@ async def get_performance_reports():
 async def get_all_transactions(timeframe: str = "all", limit: int = 500):
     return engine.router.db.get_all_transactions_by_timeframe(timeframe=timeframe, limit=limit)
 
+@app.get("/api/ledgers/daily-progression")
+async def get_daily_compounding_progression():
+    return engine.router.db.get_daily_compounding_ledger(config.INITIAL_CAPITAL_USDT)
+
+@app.get("/api/ledgers/by-date")
+async def get_ledger_for_specific_date(date: str = "today", limit: int = 300):
+    return engine.router.db.get_ledger_for_date(target_date=date, limit=limit, initial_capital=config.INITIAL_CAPITAL_USDT)
+
 @app.get("/api/agents/status")
 async def get_agents_status(symbol: str = "BTC/USDT"):
     tier = getattr(engine.defense.matrix, "active_layer_index", 1)

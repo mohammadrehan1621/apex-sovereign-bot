@@ -354,3 +354,150 @@ class CitadelDatabaseVault:
                 "swing_trades": swings,
                 "hft_trades": hft
             }
+
+    def get_daily_compounding_ledger(self, initial_capital: float = 10000.0) -> List[Dict[str, Any]]:
+        """
+        Calculates day-by-day compounding roll-forward capital ledger:
+        Opening Capital + Today's Profit = Closing Capital (Next Day Starting Capital).
+        """
+        import datetime
+        today_str = datetime.date.today().isoformat()
+        yesterday_str = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
+
+        with self._get_connection() as conn:
+            query = """
+                SELECT 
+                    trade_date,
+                    SUM(swing_pnl) as swing_pnl,
+                    SUM(hft_pnl) as hft_pnl,
+                    SUM(swing_cnt) as swing_cnt,
+                    SUM(hft_cnt) as hft_cnt,
+                    SUM(alpha_saved) as alpha_saved
+                FROM (
+                    SELECT 
+                        DATE(created_at) as trade_date,
+                        SUM(pnl) as swing_pnl,
+                        0.0 as hft_pnl,
+                        COUNT(*) as swing_cnt,
+                        0 as hft_cnt,
+                        SUM(alpha_saved_usd) as alpha_saved
+                    FROM swing_trades
+                    GROUP BY DATE(created_at)
+                    UNION ALL
+                    SELECT 
+                        DATE(created_at) as trade_date,
+                        0.0 as swing_pnl,
+                        SUM(pnl) as hft_pnl,
+                        0 as swing_cnt,
+                        COUNT(*) as hft_cnt,
+                        0.0 as alpha_saved
+                    FROM hft_executions
+                    GROUP BY DATE(created_at)
+                )
+                GROUP BY trade_date
+                ORDER BY trade_date ASC
+            """
+            rows = conn.execute(query).fetchall()
+
+            progression = []
+            running_capital = initial_capital
+
+            for r in rows:
+                date_str = r["trade_date"]
+                s_pnl = float(r["swing_pnl"] or 0.0)
+                h_pnl = float(r["hft_pnl"] or 0.0)
+                day_pnl = round(s_pnl + h_pnl, 4)
+                starting_cap = round(running_capital, 2)
+                ending_cap = round(starting_cap + day_pnl, 2)
+                roi_pct = round((day_pnl / max(starting_cap, 1.0)) * 100.0, 2)
+                total_trades = int(r["swing_cnt"] + r["hft_cnt"])
+
+                label = date_str
+                if date_str == today_str:
+                    label = f"Today ({date_str})"
+                elif date_str == yesterday_str:
+                    label = f"Yesterday ({date_str})"
+
+                entry = {
+                    "date": date_str,
+                    "label": label,
+                    "is_today": (date_str == today_str),
+                    "is_yesterday": (date_str == yesterday_str),
+                    "starting_capital": starting_cap,
+                    "day_pnl": day_pnl,
+                    "swing_pnl": round(s_pnl, 2),
+                    "hft_pnl": round(h_pnl, 2),
+                    "ending_capital": ending_cap,
+                    "next_day_capital": ending_cap,
+                    "roi_pct": roi_pct,
+                    "total_trades": total_trades,
+                    "swing_trades_count": int(r["swing_cnt"]),
+                    "hft_trades_count": int(r["hft_cnt"]),
+                    "alpha_saved": round(float(r["alpha_saved"] or 0.0), 2)
+                }
+                progression.append(entry)
+                running_capital = ending_cap
+
+            return list(reversed(progression))
+
+    def get_ledger_for_date(self, target_date: str, limit: int = 300, initial_capital: float = 10000.0) -> Dict[str, Any]:
+        """
+        Retrieves detailed trade ledger and capital accounting for a specific calendar date.
+        Supports 'today', 'yesterday', or 'YYYY-MM-DD'.
+        """
+        import datetime
+        today_date = datetime.date.today()
+        if target_date.lower() == "today":
+            date_key = today_date.isoformat()
+        elif target_date.lower() == "yesterday":
+            date_key = (today_date - datetime.timedelta(days=1)).isoformat()
+        else:
+            date_key = target_date
+
+        daily_prog = self.get_daily_compounding_ledger(initial_capital)
+        day_stat = next((d for d in daily_prog if d["date"] == date_key), None)
+
+        with self._get_connection() as conn:
+            swings_rows = conn.execute("""
+                SELECT * FROM swing_trades
+                WHERE DATE(created_at) = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (date_key, limit)).fetchall()
+            swings = [dict(r) for r in swings_rows]
+
+            hft_rows = conn.execute("""
+                SELECT * FROM hft_executions
+                WHERE DATE(created_at) = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+            """, (date_key, limit)).fetchall()
+            hft = [dict(r) for r in hft_rows]
+
+            if not day_stat:
+                starting_cap = initial_capital
+                day_pnl = sum(t.get("pnl", 0.0) for t in swings) + sum(h.get("pnl", 0.0) for h in hft)
+                day_stat = {
+                    "date": date_key,
+                    "label": date_key,
+                    "is_today": (date_key == today_date.isoformat()),
+                    "is_yesterday": (date_key == (today_date - datetime.timedelta(days=1)).isoformat()),
+                    "starting_capital": starting_cap,
+                    "day_pnl": round(day_pnl, 2),
+                    "swing_pnl": round(sum(t.get("pnl", 0.0) for t in swings), 2),
+                    "hft_pnl": round(sum(h.get("pnl", 0.0) for h in hft), 4),
+                    "ending_capital": round(starting_cap + day_pnl, 2),
+                    "next_day_capital": round(starting_cap + day_pnl, 2),
+                    "roi_pct": round((day_pnl / max(starting_cap, 1.0)) * 100.0, 2),
+                    "total_trades": len(swings) + len(hft),
+                    "swing_trades_count": len(swings),
+                    "hft_trades_count": len(hft),
+                    "alpha_saved": 0.0
+                }
+
+            return {
+                "date": date_key,
+                "summary": day_stat,
+                "swing_trades": swings,
+                "hft_trades": hft
+            }
